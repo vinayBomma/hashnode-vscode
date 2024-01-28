@@ -12,10 +12,16 @@
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "hashnode-on-vscode.helloWorld",
-      "title": "Hello World"
-    }]
+    "commands": [
+      {
+        "command": "hashnode-on-vscode.getHashnode",
+        "title": "Hey HN"
+      },
+      {
+        "command": "hashnode-on-vscode.addToken",
+        "title": "Add Token"
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",

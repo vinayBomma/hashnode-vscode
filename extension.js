@@ -9,6 +9,7 @@ const vscode = require("vscode");
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+  const secrets = context["secrets"];
   const subDisposable = [];
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
@@ -49,8 +50,12 @@ function activate(context) {
       });
 
       if (accessToken) {
-        vscode.window.showInformationMessage("Access Token is valid!");
+        await secrets.store("hashnode-on-vscode.accessToken", accessToken);
+        vscode.window.showInformationMessage("Access Token stored securely!");
       }
+
+      const token = await secrets.get("hashnode-on-vscode.accessToken");
+      console.log("Token ", token);
     }
   );
   subDisposable.push(addToken);
@@ -58,7 +63,6 @@ function activate(context) {
   context.subscriptions.push(...subDisposable);
 }
 
-// This method is called when your extension is deactivated
 function deactivate() {}
 
 module.exports = {

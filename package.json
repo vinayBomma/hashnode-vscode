@@ -20,8 +20,31 @@
       {
         "command": "hashnode-on-vscode.addToken",
         "title": "Add Token"
+      },
+      {
+        "command": "hashnode-on-vscode.showUserPanel",
+        "title": "Show Panel"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "hashnode",
+          "title": "Hashnode on VSCode",
+          "icon": "$(debug-breakpoint-log-unverified)"
+        }
+      ]
+    },
+    "views": {
+      "hashnode": [
+        {
+          "id": "notepad.notesList",
+          "name": "My Notes",
+          "type": "tree",
+          "visibility": "visible"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",

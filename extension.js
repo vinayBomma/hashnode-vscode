@@ -1,17 +1,14 @@
 // The module 'vscode' contains the VS Code extensibility API
+
+// import { getAuthUser } from "./api/queries.js";
+
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
+// const { getAuthUser } = require("./api/queries");
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-
-/**
- * @param {vscode.ExtensionContext} context
- */
 function activate(context) {
   const secrets = context["secrets"];
   const subDisposable = [];
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log(
     'Congratulations, your extension "hashnode-on-vscode" is now active!'
@@ -35,7 +32,7 @@ function activate(context) {
     async () => {
       const accessToken = await vscode.window.showInputBox({
         prompt: "Please Enter Hashnode Access Token",
-        title: "Enter Hashnode Access Token",
+        title: "Hashnode Access Token",
         validateInput: (token) => {
           if (!token) {
             return "Please enter an access token.";
@@ -55,7 +52,9 @@ function activate(context) {
       }
 
       const token = await secrets.get("hashnode-on-vscode.accessToken");
-      console.log("Token ", token);
+      // const user = await getAuthUser(token);
+      // console.log("Token ", token);
+      // console.log("user: ", user);
     }
   );
   subDisposable.push(addToken);

@@ -1,6 +1,6 @@
 import { GraphQLClient, gql, request } from "graphql-request";
 
-export const getAuthUser = async (token) => {
+export const getAuthUser = async (token: string) => {
   const apiEndpoint = "https://gql.hashnode.com";
   const graphQLClient = new GraphQLClient(apiEndpoint, {
     headers: {
@@ -19,4 +19,5 @@ export const getAuthUser = async (token) => {
 
   const data = await graphQLClient.request(query);
   console.log(data);
+  return data;
 };

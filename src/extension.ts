@@ -3,12 +3,13 @@
 // import { getAuthUser } from "./api/queries.js";
 
 // Import the module and reference it with the alias vscode in your code below
-const vscode = require("vscode");
+import * as vscode from 'vscode';
+import { getAuthUser } from './api/queries';
 // const { getAuthUser } = require("./api/queries");
 
-function activate(context) {
+export function activate(context: vscode.ExtensionContext) {
   const secrets = context["secrets"];
-  const subDisposable = [];
+  // const subDisposable = [];
   // This line of code will only be executed once when your extension is activated
   console.log(
     'Congratulations, your extension "hashnode-on-vscode" is now active!'
@@ -26,7 +27,7 @@ function activate(context) {
       vscode.window.showInformationMessage("Hello Hashnode Users!!");
     }
   );
-  subDisposable.push(disposable);
+  // subDisposable.push(disposable);
   let addToken = vscode.commands.registerCommand(
     "hashnode-on-vscode.addToken",
     async () => {
@@ -52,19 +53,18 @@ function activate(context) {
       }
 
       const token = await secrets.get("hashnode-on-vscode.accessToken");
-      // const user = await getAuthUser(token);
-      // console.log("Token ", token);
-      // console.log("user: ", user);
+      if(token){
+        const user = await getAuthUser(token);
+        console.log("Token ", token);
+        console.log("user: ", user);
+      }
     }
   );
-  subDisposable.push(addToken);
+  // subDisposable.push(addToken);
 
-  context.subscriptions.push(...subDisposable);
+  context.subscriptions.push(disposable);
+  context.subscriptions.push(addToken)
 }
 
-function deactivate() {}
+export function deactivate() {}
 
-module.exports = {
-  activate,
-  deactivate,
-};

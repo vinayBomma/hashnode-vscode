@@ -1,22 +1,36 @@
 // The module 'vscode' contains the VS Code extensibility API
 
-// import { getAuthUser } from "./api/queries.js";
-
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { getAuthUser } from "./api/queries";
 import { NotepadDataProvider } from "./providers/BlogDataProvider";
 import { Note } from "./types/Note";
 import { readData, saveData } from "./utilities/globalState";
-// const { getAuthUser } = require("./api/queries");
 
 export function activate(context: vscode.ExtensionContext) {
   let notes: Note[] = [];
   // const secrets = context["secrets"];
-  const hashnodeToken = readData(context, "hashnode-on-vscode.accessToken");
-  if (hashnodeToken) {
-    console.log("token present: ", hashnodeToken);
+
+  function getWelcomeContent(token: any) {
+    if (token) {
+      vscode.commands.executeCommand(
+        "setContext",
+        "hashnode-on-vscode.getWelcomeContent",
+        token
+      );
+    } else {
+      vscode.commands.executeCommand(
+        "setContext",
+        "hashnode-on-vscode.getWelcomeContent",
+        token
+      );
+    }
   }
+
+  const hashnodeToken = readData(context, "accessToken");
+  console.log("token ", hashnodeToken);
+  getWelcomeContent(hashnodeToken);
+
   // This line of code will only be executed once when your extension is activated
   console.log(
     'Congratulations, your extension "hashnode-on-vscode" is now active!'
@@ -67,11 +81,12 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (accessToken) {
         saveData(context, "accessToken", accessToken);
+        const heheToken = readData(context, "accessToken");
+        console.log("hehe ", heheToken);
         vscode.window.showInformationMessage("Access Token stored securely!");
         const token = readData(context, "accessToken");
         if (token) {
           const response = await getAuthUser(token);
-          console.log("Token ", typeof token);
           // console.log("user: ", response);
           vscode.window.showWarningMessage(JSON.stringify(response));
 
@@ -83,15 +98,26 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const fetchToken = vscode.commands.registerCommand(
-    "hashnode-on-vscode.fetchToken",
-    async () => {
-      //
+  const createNote = vscode.commands.registerCommand(
+    "notepad.createNote",
+    () => {
+      // const id = uuidv4();
+
+      const newNote: Note = {
+        id: "1234",
+        title: "New note",
+        content: "",
+        tags: ["Personal"],
+      };
+
+      notes.push(newNote);
+      notepadDataProvider.refresh(notes);
     }
   );
 
   context.subscriptions.push(disposable);
   context.subscriptions.push(addToken);
+  context.subscriptions.push(createNote);
 }
 
 export function deactivate() {}

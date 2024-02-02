@@ -22,8 +22,23 @@
         "title": "Add Token"
       },
       {
-        "command": "hashnode-on-vscode.showUserPanel",
-        "title": "Show Panel"
+        "command": "hashnode-on-vscode.getWelcomeContent",
+        "title": "Get Welcome Content"
+      },
+      {
+        "command": "notepad.createNote",
+        "title": "Notepad: Create a note",
+        "icon": "$(add)"
+      },
+      {
+        "command": "notepad.deleteNote",
+        "title": "Notepad: Delete note",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "notepad.editNote",
+        "title": "Notepad: Edit note",
+        "icon": "$(edit)"
       }
     ],
     "viewsContainers": {
@@ -48,9 +63,33 @@
     "viewsWelcome": [
       {
         "view": "hashnode-on-vscode.blogsList",
+        "when": "hashnode-on-vscode.getWelcomeContent",
+        "contents": "Access Token Found \n[Add Blog](command:notepad.createNote)"
+      },
+      {
+        "view": "hashnode-on-vscode.blogsList",
+        "when": "!hashnode-on-vscode.getWelcomeContent",
         "contents": "Access Token Not Found! \nToken can be generated from below URL: [https://hashnode.com/settings/developer](https://hashnode.com/settings/developer) \n[Add Hashnode Access Token](command:hashnode-on-vscode.addToken)"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "notepad.createNote",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "notepad.deleteNote",
+          "group": "inline"
+        },
+        {
+          "command": "notepad.editNote",
+          "group": "inline"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

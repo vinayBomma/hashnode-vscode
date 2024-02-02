@@ -38,13 +38,19 @@
     "views": {
       "hashnode": [
         {
-          "id": "notepad.notesList",
+          "id": "hashnode-on-vscode.blogsList",
           "name": "Blogs",
           "type": "tree",
           "visibility": "visible"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "hashnode-on-vscode.blogsList",
+        "contents": "Access Token Not Found! \nToken can be generated from below URL: [https://hashnode.com/settings/developer](https://hashnode.com/settings/developer) \n[Add Hashnode Access Token](command:hashnode-on-vscode.addToken)"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -58,20 +64,21 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4",
     "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.8"
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.56.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0",
     "graphql-request": "^6.1.0"
   }
 }

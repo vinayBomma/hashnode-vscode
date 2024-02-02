@@ -35,25 +35,36 @@ exports.deactivate = exports.activate = void 0;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(__webpack_require__(1));
 const queries_1 = __webpack_require__(2);
+const BlogDataProvider_1 = __webpack_require__(143);
+const globalState_1 = __webpack_require__(144);
 // const { getAuthUser } = require("./api/queries");
 function activate(context) {
-    const secrets = context["secrets"];
-    // const subDisposable = [];
+    let notes = [];
+    // const secrets = context["secrets"];
+    const hashnodeToken = (0, globalState_1.readData)(context, "hashnode-on-vscode.accessToken");
+    if (hashnodeToken) {
+        console.log("token present: ", hashnodeToken);
+    }
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "hashnode-on-vscode" is now active!');
+    const notepadDataProvider = new BlogDataProvider_1.NotepadDataProvider(notes);
+    // Create a tree view to contain the list of notepad notes
+    const treeView = vscode.window.createTreeView("hashnode-on-vscode.blogsList", {
+        treeDataProvider: notepadDataProvider,
+        showCollapseAll: false,
+    });
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand("hashnode-on-vscode.getHashnode", function () {
+    const disposable = vscode.commands.registerCommand("hashnode-on-vscode.getHashnode", function () {
         // The code you place here will be executed every time your command is executed
         // Display a message box to the user
         vscode.window.showInformationMessage("Hello Hashnode Users!!");
     });
-    // subDisposable.push(disposable);
-    let addToken = vscode.commands.registerCommand("hashnode-on-vscode.addToken", async () => {
+    const addToken = vscode.commands.registerCommand("hashnode-on-vscode.addToken", async () => {
         const accessToken = await vscode.window.showInputBox({
             prompt: "Please Enter Hashnode Access Token",
-            title: "Hashnode Access Token",
+            title: "Add Hashnode Access Token",
             validateInput: (token) => {
                 if (!token) {
                     return "Please enter an access token.";
@@ -65,17 +76,23 @@ function activate(context) {
             },
         });
         if (accessToken) {
-            await secrets.store("hashnode-on-vscode.accessToken", accessToken);
+            (0, globalState_1.saveData)(context, "accessToken", accessToken);
             vscode.window.showInformationMessage("Access Token stored securely!");
-        }
-        const token = await secrets.get("hashnode-on-vscode.accessToken");
-        if (token) {
-            const user = await (0, queries_1.getAuthUser)(token);
-            console.log("Token ", token);
-            console.log("user: ", user);
+            const token = (0, globalState_1.readData)(context, "accessToken");
+            if (token) {
+                const response = await (0, queries_1.getAuthUser)(token);
+                console.log("Token ", typeof token);
+                // console.log("user: ", response);
+                vscode.window.showWarningMessage(JSON.stringify(response));
+                // if(response){
+                //   if(response.errors)
+                // }
+            }
         }
     });
-    // subDisposable.push(addToken);
+    const fetchToken = vscode.commands.registerCommand("hashnode-on-vscode.fetchToken", async () => {
+        //
+    });
     context.subscriptions.push(disposable);
     context.subscriptions.push(addToken);
 }
@@ -100,8 +117,8 @@ module.exports = require("vscode");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAuthUser = void 0;
 const graphql_request_1 = __webpack_require__(3);
+const apiEndpoint = "https://gql.hashnode.com";
 const getAuthUser = async (token) => {
-    const apiEndpoint = "https://gql.hashnode.com";
     const graphQLClient = new graphql_request_1.GraphQLClient(apiEndpoint, {
         headers: {
             authorization: token,
@@ -112,11 +129,36 @@ const getAuthUser = async (token) => {
       me {
         id
         username
+        posts(page: 1, pageSize: 5) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+      post(id: "6422c561689cfdac66b627ae") {
+        title
+        subtitle
+        content {
+          markdown
+          text
+        }
       }
     }
   `;
-    const data = await graphQLClient.request(query);
-    console.log(data);
+    const data = await graphQLClient
+        .request(query)
+        .then((res) => {
+        console.log("res: ", res);
+        return { res };
+    })
+        .catch((err) => {
+        console.log("errarta: ", err?.response?.errors[0]?.message);
+        return {
+            message: "Invalid Access Token. Please verify your token and try again.",
+        };
+    });
     return data;
 };
 exports.getAuthUser = getAuthUser;
@@ -24889,6 +24931,81 @@ function Complete(id) {
     return new GraphQLWebSocketMessage(COMPLETE, undefined, id);
 }
 //# sourceMappingURL=graphql-ws.js.map
+
+/***/ }),
+/* 143 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.NotepadDataProvider = void 0;
+const vscode_1 = __webpack_require__(1);
+/**
+ * An implementation of the TreeDataProvider interface.
+ *
+ * This class is responsible for managing the tree data that the VS Code
+ * TreeView API needs to render a custom tree view.
+ *
+ * Learn more about Tree Data Providers here:
+ * https://code.visualstudio.com/api/extension-guides/tree-view#tree-data-provider
+ */
+class NotepadDataProvider {
+    _onDidChangeTreeData = new vscode_1.EventEmitter();
+    onDidChangeTreeData = this._onDidChangeTreeData.event;
+    data;
+    constructor(notesData) {
+        this.data = notesData.map((note) => new NotepadNote(note.id, note.title));
+    }
+    refresh(notesData) {
+        this._onDidChangeTreeData.fire();
+        this.data = notesData.map((note) => new NotepadNote(note.id, note.title));
+    }
+    getTreeItem(element) {
+        return element;
+    }
+    getChildren(element) {
+        if (element === undefined) {
+            return this.data;
+        }
+        return element.children;
+    }
+    getParent() {
+        return null;
+    }
+}
+exports.NotepadDataProvider = NotepadDataProvider;
+class NotepadNote extends vscode_1.TreeItem {
+    children;
+    constructor(noteId, noteTitle) {
+        super(noteTitle);
+        this.id = noteId;
+        this.iconPath = new vscode_1.ThemeIcon("note");
+        this.command = {
+            title: "Open note",
+            command: "notepad.showNoteDetailView",
+        };
+    }
+}
+
+
+/***/ }),
+/* 144 */
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.readData = exports.saveData = void 0;
+const saveData = (context, key, value) => {
+    context.globalState.update(key, value);
+};
+exports.saveData = saveData;
+const readData = (context, key) => {
+    return context.globalState.get(key);
+};
+exports.readData = readData;
+
 
 /***/ })
 /******/ 	]);

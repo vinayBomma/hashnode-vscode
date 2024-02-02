@@ -44,14 +44,14 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "hashnode",
+          "id": "hashnode-on-vscode",
           "title": "Hashnode on VSCode",
           "icon": "$(debug-breakpoint-log-unverified)"
         }
       ]
     },
     "views": {
-      "hashnode": [
+      "hashnode-on-vscode": [
         {
           "id": "hashnode-on-vscode.blogsList",
           "name": "Blogs",
@@ -81,11 +81,11 @@
       ],
       "view/item/context": [
         {
-          "command": "notepad.deleteNote",
+          "command": "notepad.editNote",
           "group": "inline"
         },
         {
-          "command": "notepad.editNote",
+          "command": "notepad.deleteNote",
           "group": "inline"
         }
       ]

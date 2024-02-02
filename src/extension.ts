@@ -9,6 +9,7 @@ import { readData, saveData } from "./utilities/globalState";
 
 export function activate(context: vscode.ExtensionContext) {
   let notes: Post[] = [];
+  let blogs: Post[] = [];
   // const secrets = context["secrets"];
 
   const getWelcomeContent = async (token: any) => {
@@ -19,10 +20,17 @@ export function activate(context: vscode.ExtensionContext) {
         token
       );
       const response = await getAuthUser(token);
+
       // console.log("response: ", response?.nodes);
       response?.nodes.forEach((node) => {
-        console.log("this is the title: ", node.title);
+        const newBlog: Post = {
+          id: node.id,
+          title: node.title,
+          content: node.content,
+        };
+        blogs.push(newBlog);
       });
+      console.log(blogs);
     } else {
       vscode.commands.executeCommand(
         "setContext",
@@ -92,12 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
         const token = readData(context, "accessToken");
         if (token) {
           const response = await getAuthUser(token);
-          // console.log("user: ", response);
           vscode.window.showWarningMessage(JSON.stringify(response));
-
-          // if(response){
-          //   if(response.errors)
-          // }
         }
       }
     }
@@ -106,18 +109,7 @@ export function activate(context: vscode.ExtensionContext) {
   const createNote = vscode.commands.registerCommand(
     "notepad.createNote",
     () => {
-      // const id = uuidv4();
-
-      const newNote: Post = {
-        id: "1234",
-        title: "New note",
-        content: {
-          html: "<span>hey there</span>",
-        },
-      };
-
-      notes.push(newNote);
-      notepadDataProvider.refresh(notes);
+      notepadDataProvider.refresh(blogs);
     }
   );
 

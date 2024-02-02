@@ -38,6 +38,7 @@ const BlogDataProvider_1 = __webpack_require__(143);
 const globalState_1 = __webpack_require__(144);
 function activate(context) {
     let notes = [];
+    let blogs = [];
     // const secrets = context["secrets"];
     const getWelcomeContent = async (token) => {
         if (token) {
@@ -45,8 +46,14 @@ function activate(context) {
             const response = await (0, queries_1.getAuthUser)(token);
             // console.log("response: ", response?.nodes);
             response?.nodes.forEach((node) => {
-                console.log("this is the title: ", node.title);
+                const newBlog = {
+                    id: node.id,
+                    title: node.title,
+                    content: node.content,
+                };
+                blogs.push(newBlog);
             });
+            console.log(blogs);
         }
         else {
             vscode.commands.executeCommand("setContext", "hashnode-on-vscode.getWelcomeContent", token);
@@ -93,25 +100,12 @@ function activate(context) {
             const token = (0, globalState_1.readData)(context, "accessToken");
             if (token) {
                 const response = await (0, queries_1.getAuthUser)(token);
-                // console.log("user: ", response);
                 vscode.window.showWarningMessage(JSON.stringify(response));
-                // if(response){
-                //   if(response.errors)
-                // }
             }
         }
     });
     const createNote = vscode.commands.registerCommand("notepad.createNote", () => {
-        // const id = uuidv4();
-        const newNote = {
-            id: "1234",
-            title: "New note",
-            content: {
-                html: "<span>hey there</span>",
-            },
-        };
-        notes.push(newNote);
-        notepadDataProvider.refresh(notes);
+        notepadDataProvider.refresh(blogs);
     });
     context.subscriptions.push(disposable);
     context.subscriptions.push(addToken);
@@ -164,21 +158,11 @@ const getAuthUser = async (token) => {
   `;
     try {
         const data = await graphQLClient.request(query);
-        // .then((res) => {
-        //   console.log("res: ", res);
-        //   // return { res };
-        //   return data.arg1.posts;
         return data.me.posts;
         // })
     }
     catch (err) {
         console.log(err);
-        // console.log("errarta: ", err?.response?.errors[0]?.message);
-        // return {
-        //   message:
-        //     "Invalid Access Token. Please verify your token and try again.",
-        // };
-        // return data.arg1.posts;
     }
 };
 exports.getAuthUser = getAuthUser;

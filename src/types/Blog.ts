@@ -8,7 +8,7 @@ export type Note = {
   tags?: string[];
 };
 
-export interface AuthUser {
+export type AuthUser = {
   me: {
     name: string;
     posts: {
@@ -16,12 +16,23 @@ export interface AuthUser {
       nodes: Post[];
     };
   };
-}
+};
 
-export interface Post {
+export type Post = {
   id: string;
   title: string;
   content: {
     html: string;
   };
-}
+};
+
+export type AuthError<T = any> = {
+  response: {
+    data: T;
+    errors: Message[];
+  };
+};
+
+export type Message = {
+  message: string;
+};

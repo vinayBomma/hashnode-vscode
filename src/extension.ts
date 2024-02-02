@@ -4,20 +4,25 @@
 import * as vscode from "vscode";
 import { getAuthUser } from "./api/queries";
 import { NotepadDataProvider } from "./providers/BlogDataProvider";
-import { Note } from "./types/Note";
+import { Note, Post } from "./types/Blog";
 import { readData, saveData } from "./utilities/globalState";
 
 export function activate(context: vscode.ExtensionContext) {
-  let notes: Note[] = [];
+  let notes: Post[] = [];
   // const secrets = context["secrets"];
 
-  function getWelcomeContent(token: any) {
+  const getWelcomeContent = async (token: any) => {
     if (token) {
       vscode.commands.executeCommand(
         "setContext",
         "hashnode-on-vscode.getWelcomeContent",
         token
       );
+      const response = await getAuthUser(token);
+      // console.log("response: ", response?.nodes);
+      response?.nodes.forEach((node) => {
+        console.log("this is the title: ", node.title);
+      });
     } else {
       vscode.commands.executeCommand(
         "setContext",
@@ -25,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
         token
       );
     }
-  }
+  };
 
   const hashnodeToken = readData(context, "accessToken");
   console.log("token ", hashnodeToken);
@@ -103,11 +108,12 @@ export function activate(context: vscode.ExtensionContext) {
     () => {
       // const id = uuidv4();
 
-      const newNote: Note = {
+      const newNote: Post = {
         id: "1234",
         title: "New note",
-        content: "",
-        tags: ["Personal"],
+        content: {
+          html: "<span>hey there</span>",
+        },
       };
 
       notes.push(newNote);

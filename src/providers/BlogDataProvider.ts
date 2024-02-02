@@ -6,7 +6,7 @@ import {
   TreeDataProvider,
   TreeItem,
 } from "vscode";
-import { Note } from "../types/Note";
+import { Note, Post } from "../types/Blog";
 
 // A custom type to keep the code below more tidy
 type TreeDataOnChangeEvent = NotepadNote | undefined | null | void;
@@ -27,11 +27,11 @@ export class NotepadDataProvider implements TreeDataProvider<NotepadNote> {
 
   data: NotepadNote[];
 
-  constructor(notesData: Note[]) {
+  constructor(notesData: Post[]) {
     this.data = notesData.map((note) => new NotepadNote(note.id, note.title));
   }
 
-  refresh(notesData: Note[]): void {
+  refresh(notesData: Post[]): void {
     this._onDidChangeTreeData.fire();
     this.data = notesData.map((note) => new NotepadNote(note.id, note.title));
   }

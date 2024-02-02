@@ -31,20 +31,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deactivate = exports.activate = void 0;
-// import { getAuthUser } from "./api/queries.js";
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(__webpack_require__(1));
 const queries_1 = __webpack_require__(2);
 const BlogDataProvider_1 = __webpack_require__(143);
 const globalState_1 = __webpack_require__(144);
-// const { getAuthUser } = require("./api/queries");
 function activate(context) {
     let notes = [];
     // const secrets = context["secrets"];
-    const hashnodeToken = (0, globalState_1.readData)(context, "hashnode-on-vscode.accessToken");
-    if (hashnodeToken) {
-        console.log("token present: ", hashnodeToken);
-    }
+    const getWelcomeContent = async (token) => {
+        if (token) {
+            vscode.commands.executeCommand("setContext", "hashnode-on-vscode.getWelcomeContent", token);
+            const response = await (0, queries_1.getAuthUser)(token);
+            // console.log("response: ", response?.nodes);
+            response?.nodes.forEach((node) => {
+                console.log("this is the title: ", node.title);
+            });
+        }
+        else {
+            vscode.commands.executeCommand("setContext", "hashnode-on-vscode.getWelcomeContent", token);
+        }
+    };
+    const hashnodeToken = (0, globalState_1.readData)(context, "accessToken");
+    console.log("token ", hashnodeToken);
+    getWelcomeContent(hashnodeToken);
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "hashnode-on-vscode" is now active!');
     const notepadDataProvider = new BlogDataProvider_1.NotepadDataProvider(notes);
@@ -77,11 +87,12 @@ function activate(context) {
         });
         if (accessToken) {
             (0, globalState_1.saveData)(context, "accessToken", accessToken);
+            const heheToken = (0, globalState_1.readData)(context, "accessToken");
+            console.log("hehe ", heheToken);
             vscode.window.showInformationMessage("Access Token stored securely!");
             const token = (0, globalState_1.readData)(context, "accessToken");
             if (token) {
                 const response = await (0, queries_1.getAuthUser)(token);
-                console.log("Token ", typeof token);
                 // console.log("user: ", response);
                 vscode.window.showWarningMessage(JSON.stringify(response));
                 // if(response){
@@ -90,11 +101,21 @@ function activate(context) {
             }
         }
     });
-    const fetchToken = vscode.commands.registerCommand("hashnode-on-vscode.fetchToken", async () => {
-        //
+    const createNote = vscode.commands.registerCommand("notepad.createNote", () => {
+        // const id = uuidv4();
+        const newNote = {
+            id: "1234",
+            title: "New note",
+            content: {
+                html: "<span>hey there</span>",
+            },
+        };
+        notes.push(newNote);
+        notepadDataProvider.refresh(notes);
     });
     context.subscriptions.push(disposable);
     context.subscriptions.push(addToken);
+    context.subscriptions.push(createNote);
 }
 exports.activate = activate;
 function deactivate() { }
@@ -127,39 +148,38 @@ const getAuthUser = async (token) => {
     const query = (0, graphql_request_1.gql) `
     {
       me {
-        id
-        username
-        posts(page: 1, pageSize: 5) {
-          edges {
-            node {
-              id
+        name
+        posts(page: 1, pageSize: 10) {
+          totalDocuments
+          nodes {
+            id
+            title
+            content {
+              html
             }
           }
         }
       }
-      post(id: "6422c561689cfdac66b627ae") {
-        title
-        subtitle
-        content {
-          markdown
-          text
-        }
-      }
     }
   `;
-    const data = await graphQLClient
-        .request(query)
-        .then((res) => {
-        console.log("res: ", res);
-        return { res };
-    })
-        .catch((err) => {
-        console.log("errarta: ", err?.response?.errors[0]?.message);
-        return {
-            message: "Invalid Access Token. Please verify your token and try again.",
-        };
-    });
-    return data;
+    try {
+        const data = await graphQLClient.request(query);
+        // .then((res) => {
+        //   console.log("res: ", res);
+        //   // return { res };
+        //   return data.arg1.posts;
+        return data.me.posts;
+        // })
+    }
+    catch (err) {
+        console.log(err);
+        // console.log("errarta: ", err?.response?.errors[0]?.message);
+        // return {
+        //   message:
+        //     "Invalid Access Token. Please verify your token and try again.",
+        // };
+        // return data.arg1.posts;
+    }
 };
 exports.getAuthUser = getAuthUser;
 

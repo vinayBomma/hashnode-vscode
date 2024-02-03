@@ -4,10 +4,11 @@
 import * as vscode from "vscode";
 import { getAuthUser } from "./api/queries";
 import { NotepadDataProvider } from "./providers/BlogDataProvider";
-import { Note, Post } from "./types/Blog";
+import { NewPost, Note, Post } from "./types/Blog";
 import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
 import { marked } from "marked";
+import ObjectID from "bson-objectid";
 
 export function activate(context: vscode.ExtensionContext) {
   let notes: Post[] = [];
@@ -27,18 +28,21 @@ export function activate(context: vscode.ExtensionContext) {
       // console.log("response: ", response?.nodes);
       response?.nodes.forEach((node) => {
         const html = marked.parse(node.content.markdown);
-        console.log(html);
+        // console.log(html);
         const newBlog: Post = {
           id: node.id,
           title: node.title,
           content: {
-            html: html,
+            html: node.content.html,
             markdown: node.content.markdown,
+          },
+          coverImage: {
+            url: node.coverImage.url,
           },
         };
         blogs.push(newBlog);
       });
-      console.log(blogs);
+      // console.log(blogs);
     } else {
       vscode.commands.executeCommand(
         "setContext",
@@ -84,13 +88,11 @@ export function activate(context: vscode.ExtensionContext) {
       // If no panel is open, create a new one and update the HTML
       if (!panel) {
         panel = vscode.window.createWebviewPanel(
-          "noteDetailView",
+          "blogView",
           matchingNote.title,
           vscode.ViewColumn.One,
           {
-            // Enable JavaScript in the webview
             enableScripts: true,
-            // Restrict the webview to only load resources from the `out` directory
             localResourceRoots: [
               vscode.Uri.joinPath(context.extensionUri, "dist"),
             ],
@@ -107,30 +109,30 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       // If a panel is open and receives an update message, update the notes array and the panel title/html
-      panel.webview.onDidReceiveMessage((message) => {
-        const command = message.command;
-        const note = message.note;
-        switch (command) {
-          case "updateNote":
-            const updatedNoteId = note.id;
-            const copyOfNotesArray = [...notes];
-            const matchingNoteIndex = copyOfNotesArray.findIndex(
-              (note) => note.id === updatedNoteId
-            );
-            copyOfNotesArray[matchingNoteIndex] = note;
-            notes = copyOfNotesArray;
-            notepadDataProvider.refresh(notes);
-            panel
-              ? ((panel.title = note.title),
-                (panel.webview.html = getWebviewContent(
-                  panel.webview,
-                  context.extensionUri,
-                  note
-                )))
-              : null;
-            break;
-        }
-      });
+      // panel.webview.onDidReceiveMessage((message) => {
+      //   const command = message.command;
+      //   const note = message.note;
+      //   switch (command) {
+      //     case "updateNote":
+      //       const updatedNoteId = note.id;
+      //       const copyOfNotesArray = [...notes];
+      //       const matchingNoteIndex = copyOfNotesArray.findIndex(
+      //         (note) => note.id === updatedNoteId
+      //       );
+      //       copyOfNotesArray[matchingNoteIndex] = note;
+      //       notes = copyOfNotesArray;
+      //       notepadDataProvider.refresh(notes);
+      //       panel
+      //         ? ((panel.title = note.title),
+      //           (panel.webview.html = getWebviewContent(
+      //             panel.webview,
+      //             context.extensionUri,
+      //             note
+      //           )))
+      //         : null;
+      //       break;
+      //   }
+      // });
 
       panel.onDidDispose(
         () => {
@@ -189,16 +191,38 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const createNote = vscode.commands.registerCommand(
-    "notepad.createNote",
+  const fetchBlog = vscode.commands.registerCommand(
+    "hashnode-on-vscode.fetchBlog",
     () => {
+      notepadDataProvider.refresh(blogs);
+    }
+  );
+
+  const createBlog = vscode.commands.registerCommand(
+    "hashnode-on-vscode.createPost",
+    () => {
+      let postID = ObjectID().toHexString();
+      // console.log("hello there", test);
+      const newPost: Post = {
+        id: postID,
+        title: "New Blog",
+        content: {
+          html: "Helo",
+          markdown: "Hello",
+        },
+        coverImage: {
+          url: "test",
+        },
+      };
+
+      blogs.push(newPost);
       notepadDataProvider.refresh(blogs);
     }
   );
 
   context.subscriptions.push(disposable);
   context.subscriptions.push(addToken);
-  context.subscriptions.push(createNote);
+  context.subscriptions.push(fetchBlog);
 }
 
 export function deactivate() {}

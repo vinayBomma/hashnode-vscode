@@ -23,6 +23,9 @@ export const getAuthUser = async (token: any) => {
               html
               markdown
             }
+            coverImage {
+              url
+            }
           }
         }
       }

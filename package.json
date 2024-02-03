@@ -19,26 +19,36 @@
       },
       {
         "command": "hashnode-on-vscode.addToken",
-        "title": "Add Token"
+        "title": "Hashnode: Add Token"
       },
       {
         "command": "hashnode-on-vscode.getWelcomeContent",
         "title": "Get Welcome Content"
       },
       {
-        "command": "notepad.createNote",
-        "title": "Notepad: Create a note",
+        "command": "hashnode-on-vscode.fetchBlog",
+        "title": "Hashnode: Fetch Blog",
         "icon": "$(add)"
       },
       {
-        "command": "notepad.deleteNote",
-        "title": "Notepad: Delete note",
-        "icon": "$(trash)"
+        "command": "hashnode-on-vscode.createPost",
+        "title": "Hashnode: Create Post",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hashnode-on-vscode.showFeed",
+        "title": "Hashnode: Show Feed",
+        "icon": "$(book)"
       },
       {
         "command": "notepad.editNote",
         "title": "Notepad: Edit note",
         "icon": "$(edit)"
+      },
+      {
+        "command": "notepad.deleteNote",
+        "title": "Notepad: Delete note",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -64,7 +74,7 @@
       {
         "view": "hashnode-on-vscode.blogsList",
         "when": "hashnode-on-vscode.getWelcomeContent",
-        "contents": "Access Token Found \n[Fetch Blog](command:notepad.createNote)"
+        "contents": "Access Token Found \n[Fetch Blog](command:hashnode-on-vscode.fetchBlog)"
       },
       {
         "view": "hashnode-on-vscode.blogsList",
@@ -75,7 +85,11 @@
     "menus": {
       "view/title": [
         {
-          "command": "notepad.createNote",
+          "command": "hashnode-on-vscode.createPost",
+          "group": "navigation@1"
+        },
+        {
+          "command": "hashnode-on-vscode.showFeed",
           "group": "navigation@1"
         }
       ],
@@ -118,6 +132,7 @@
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.4.0",
+    "bson-objectid": "^2.0.4",
     "graphql-request": "^6.1.0",
     "marked": "^11.2.0"
   }

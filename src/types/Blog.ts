@@ -25,6 +25,15 @@ export type Post = {
     html: any;
     markdown: string;
   };
+  coverImage: {
+    url: string;
+  };
+};
+
+export type NewPost = {
+  id: string;
+  title: string;
+  content: string;
 };
 
 export type AuthError<T = any> = {

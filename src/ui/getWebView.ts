@@ -1,7 +1,6 @@
 import { Webview, Uri } from "vscode";
 import { Note, Post } from "../types/Blog";
 import { getUri } from "../utilities/getUri";
-import { getNonce } from "../utilities/getNonce";
 
 export function getWebviewContent(
   webview: Webview,
@@ -10,22 +9,20 @@ export function getWebviewContent(
 ) {
   const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
   const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
-  // console.log(note, "heh");
-
-  const nonce = getNonce();
+  // console.log(note, "heh")
   //   const formattedTags = note.tags ? note.tags.join(", ") : null;
 
-  webview.onDidReceiveMessage((message) => {
-    const command = message.command;
-    switch (command) {
-      case "requestNoteData":
-        webview.postMessage({
-          command: "receiveDataInWebview",
-          payload: JSON.stringify(note),
-        });
-        break;
-    }
-  });
+  // webview.onDidReceiveMessage((message) => {
+  //   const command = message.command;
+  //   switch (command) {
+  //     case "requestNoteData":
+  //       webview.postMessage({
+  //         command: "receiveDataInWebview",
+  //         payload: JSON.stringify(note),
+  //       });
+  //       break;
+  //   }
+  // });
   return /*html*/ `
     <!DOCTYPE html>
     <html lang="en">

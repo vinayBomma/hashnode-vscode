@@ -9,6 +9,7 @@ import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
 import { marked } from "marked";
 import ObjectID from "bson-objectid";
+import { createPostWebView } from "./ui/createPostWebView";
 
 export function activate(context: vscode.ExtensionContext) {
   let notes: Post[] = [];
@@ -18,48 +19,49 @@ export function activate(context: vscode.ExtensionContext) {
 
   const getWelcomeContent = async (token: any) => {
     if (token) {
-      vscode.commands.executeCommand(
-        "setContext",
-        "hashnode-on-vscode.getWelcomeContent",
-        token
-      );
+      console.log("token: ", token);
       const response = await getAuthUser(token);
+      if (response?.nodes) {
+        vscode.commands.executeCommand(
+          "setContext",
+          "hashnode-on-vscode.getWelcomeContent",
+          token
+        );
 
-      // console.log("response: ", response?.nodes);
-      response?.nodes.forEach((node) => {
-        const html = marked.parse(node.content.markdown);
-        // console.log(html);
-        const newBlog: Post = {
-          id: node.id,
-          title: node.title,
-          content: {
-            html: node.content.html,
-            markdown: node.content.markdown,
-          },
-          coverImage: {
-            url: node.coverImage.url,
-          },
-        };
-        blogs.push(newBlog);
-      });
-      // console.log(blogs);
+        response?.nodes.forEach((node) => {
+          const newBlog: Post = {
+            id: node.id,
+            title: node.title,
+            content: {
+              html: node.content.html,
+              markdown: node.content.markdown,
+            },
+            coverImage: {
+              url: node.coverImage.url,
+            },
+          };
+          blogs.push(newBlog);
+        });
+      } else {
+        vscode.commands.executeCommand(
+          "setContext",
+          "hashnode-on-vscode.getWelcomeContent",
+          false
+        );
+      }
     } else {
       vscode.commands.executeCommand(
         "setContext",
         "hashnode-on-vscode.getWelcomeContent",
-        token
+        false
       );
     }
   };
 
   const hashnodeToken = readData(context, "accessToken");
-  console.log("token ", hashnodeToken);
   getWelcomeContent(hashnodeToken);
 
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "hashnode-on-vscode" is now active!'
-  );
+  const updateTreeView = (nodes: Object) => {};
 
   const notepadDataProvider = new NotepadDataProvider(blogs);
 
@@ -108,53 +110,13 @@ export function activate(context: vscode.ExtensionContext) {
         matchingNote
       );
 
-      // If a panel is open and receives an update message, update the notes array and the panel title/html
-      // panel.webview.onDidReceiveMessage((message) => {
-      //   const command = message.command;
-      //   const note = message.note;
-      //   switch (command) {
-      //     case "updateNote":
-      //       const updatedNoteId = note.id;
-      //       const copyOfNotesArray = [...notes];
-      //       const matchingNoteIndex = copyOfNotesArray.findIndex(
-      //         (note) => note.id === updatedNoteId
-      //       );
-      //       copyOfNotesArray[matchingNoteIndex] = note;
-      //       notes = copyOfNotesArray;
-      //       notepadDataProvider.refresh(notes);
-      //       panel
-      //         ? ((panel.title = note.title),
-      //           (panel.webview.html = getWebviewContent(
-      //             panel.webview,
-      //             context.extensionUri,
-      //             note
-      //           )))
-      //         : null;
-      //       break;
-      //   }
-      // });
-
       panel.onDidDispose(
         () => {
-          // When the panel is closed, cancel any future updates to the webview content
           panel = undefined;
         },
         null,
         context.subscriptions
       );
-    }
-  );
-
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with  registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand(
-    "hashnode-on-vscode.getHashnode",
-    function () {
-      // The code you place here will be executed every time your command is executed
-
-      // Display a message box to the user
-      vscode.window.showInformationMessage("Hello Hashnode Users!!");
     }
   );
 
@@ -179,13 +141,35 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (accessToken) {
         saveData(context, "accessToken", accessToken);
-        const heheToken = readData(context, "accessToken");
-        console.log("hehe ", heheToken);
-        vscode.window.showInformationMessage("Access Token stored securely!");
-        const token = readData(context, "accessToken");
-        if (token) {
-          const response = await getAuthUser(token);
-          vscode.window.showWarningMessage(JSON.stringify(response));
+        const response = await getAuthUser(accessToken);
+        if (response?.nodes) {
+          saveData(context, "accessToken", accessToken);
+          vscode.window.showInformationMessage("Access Token stored securely!");
+
+          vscode.commands.executeCommand(
+            "setContext",
+            "hashnode-on-vscode.getWelcomeContent",
+            accessToken
+          );
+
+          response?.nodes.forEach((node) => {
+            const newBlog: Post = {
+              id: node.id,
+              title: node.title,
+              content: {
+                html: node.content.html,
+                markdown: node.content.markdown,
+              },
+              coverImage: {
+                url: node.coverImage.url,
+              },
+            };
+            blogs.push(newBlog);
+          });
+        } else {
+          vscode.window.showErrorMessage(
+            "Access Token Invalid. Please verify your token and try again."
+          );
         }
       }
     }
@@ -202,27 +186,56 @@ export function activate(context: vscode.ExtensionContext) {
     "hashnode-on-vscode.createPost",
     () => {
       let postID = ObjectID().toHexString();
-      // console.log("hello there", test);
       const newPost: Post = {
         id: postID,
         title: "New Blog",
         content: {
-          html: "Helo",
-          markdown: "Hello",
+          html: "",
+          markdown: "",
         },
         coverImage: {
           url: "test",
         },
       };
 
-      blogs.push(newPost);
-      notepadDataProvider.refresh(blogs);
+      if (!panel) {
+        panel = vscode.window.createWebviewPanel(
+          "createPostView",
+          newPost.title,
+          vscode.ViewColumn.One,
+          {
+            enableScripts: true,
+            localResourceRoots: [
+              vscode.Uri.joinPath(context.extensionUri, "dist"),
+            ],
+          }
+        );
+      }
+
+      panel.title = newPost.title;
+      panel.webview.html = createPostWebView(
+        panel.webview,
+        context.extensionUri,
+        newPost
+      );
+
+      panel.webview.onDidReceiveMessage((message) => {
+        console.log("message: ", message);
+        const command = message.command;
+        const data = message.data;
+        switch (command) {
+          case "renderMarkdown":
+            console.log("the data: ", data);
+            break;
+        }
+      });
     }
   );
 
-  context.subscriptions.push(disposable);
   context.subscriptions.push(addToken);
   context.subscriptions.push(fetchBlog);
+  context.subscriptions.push(createBlog);
+  context.subscriptions.push(openBlog);
 }
 
 export function deactivate() {}

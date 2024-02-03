@@ -64,7 +64,7 @@
       {
         "view": "hashnode-on-vscode.blogsList",
         "when": "hashnode-on-vscode.getWelcomeContent",
-        "contents": "Access Token Found \n[Add Blog](command:notepad.createNote)"
+        "contents": "Access Token Found \n[Fetch Blog](command:notepad.createNote)"
       },
       {
         "view": "hashnode-on-vscode.blogsList",
@@ -118,6 +118,7 @@
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "graphql-request": "^6.1.0"
+    "graphql-request": "^6.1.0",
+    "marked": "^11.2.0"
   }
 }

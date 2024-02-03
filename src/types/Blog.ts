@@ -4,7 +4,7 @@
 export type Note = {
   id: string;
   title: string;
-  content?: string;
+  content?: string | { html: string };
   tags?: string[];
 };
 
@@ -22,7 +22,8 @@ export type Post = {
   id: string;
   title: string;
   content: {
-    html: string;
+    html: any;
+    markdown: string;
   };
 };
 

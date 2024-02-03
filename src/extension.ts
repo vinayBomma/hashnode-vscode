@@ -6,10 +6,13 @@ import { getAuthUser } from "./api/queries";
 import { NotepadDataProvider } from "./providers/BlogDataProvider";
 import { Note, Post } from "./types/Blog";
 import { readData, saveData } from "./utilities/globalState";
+import { getWebviewContent } from "./ui/getWebView";
+import { marked } from "marked";
 
 export function activate(context: vscode.ExtensionContext) {
   let notes: Post[] = [];
   let blogs: Post[] = [];
+  let panel: vscode.WebviewPanel | undefined = undefined;
   // const secrets = context["secrets"];
 
   const getWelcomeContent = async (token: any) => {
@@ -23,10 +26,15 @@ export function activate(context: vscode.ExtensionContext) {
 
       // console.log("response: ", response?.nodes);
       response?.nodes.forEach((node) => {
+        const html = marked.parse(node.content.markdown);
+        console.log(html);
         const newBlog: Post = {
           id: node.id,
           title: node.title,
-          content: node.content,
+          content: {
+            html: html,
+            markdown: node.content.markdown,
+          },
         };
         blogs.push(newBlog);
       });
@@ -49,7 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
     'Congratulations, your extension "hashnode-on-vscode" is now active!'
   );
 
-  const notepadDataProvider = new NotepadDataProvider(notes);
+  const notepadDataProvider = new NotepadDataProvider(blogs);
 
   // Create a tree view to contain the list of notepad notes
   const treeView = vscode.window.createTreeView(
@@ -57,6 +65,81 @@ export function activate(context: vscode.ExtensionContext) {
     {
       treeDataProvider: notepadDataProvider,
       showCollapseAll: false,
+    }
+  );
+
+  // Command to render a webview-based note view
+  const openBlog = vscode.commands.registerCommand(
+    "notepad.showNoteDetailView",
+    () => {
+      const selectedTreeViewItem = treeView.selection[0];
+      const matchingNote = blogs.find(
+        (note) => note.id === selectedTreeViewItem.id
+      );
+      if (!matchingNote) {
+        vscode.window.showErrorMessage("No matching note found");
+        return;
+      }
+
+      // If no panel is open, create a new one and update the HTML
+      if (!panel) {
+        panel = vscode.window.createWebviewPanel(
+          "noteDetailView",
+          matchingNote.title,
+          vscode.ViewColumn.One,
+          {
+            // Enable JavaScript in the webview
+            enableScripts: true,
+            // Restrict the webview to only load resources from the `out` directory
+            localResourceRoots: [
+              vscode.Uri.joinPath(context.extensionUri, "dist"),
+            ],
+          }
+        );
+      }
+
+      // If a panel is open, update the HTML with the selected item's content
+      panel.title = matchingNote.title;
+      panel.webview.html = getWebviewContent(
+        panel.webview,
+        context.extensionUri,
+        matchingNote
+      );
+
+      // If a panel is open and receives an update message, update the notes array and the panel title/html
+      panel.webview.onDidReceiveMessage((message) => {
+        const command = message.command;
+        const note = message.note;
+        switch (command) {
+          case "updateNote":
+            const updatedNoteId = note.id;
+            const copyOfNotesArray = [...notes];
+            const matchingNoteIndex = copyOfNotesArray.findIndex(
+              (note) => note.id === updatedNoteId
+            );
+            copyOfNotesArray[matchingNoteIndex] = note;
+            notes = copyOfNotesArray;
+            notepadDataProvider.refresh(notes);
+            panel
+              ? ((panel.title = note.title),
+                (panel.webview.html = getWebviewContent(
+                  panel.webview,
+                  context.extensionUri,
+                  note
+                )))
+              : null;
+            break;
+        }
+      });
+
+      panel.onDidDispose(
+        () => {
+          // When the panel is closed, cancel any future updates to the webview content
+          panel = undefined;
+        },
+        null,
+        context.subscriptions
+      );
     }
   );
 

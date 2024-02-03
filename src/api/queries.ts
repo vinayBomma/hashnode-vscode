@@ -21,6 +21,7 @@ export const getAuthUser = async (token: any) => {
             title
             content {
               html
+              markdown
             }
           }
         }

@@ -1,5 +1,5 @@
 import { Webview, Uri } from "vscode";
-import { Note, Post } from "../types/Blog";
+import { Post } from "../types/Blog";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 

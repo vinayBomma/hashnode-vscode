@@ -35,7 +35,6 @@ export const getAuthUser = async (token: any) => {
   try {
     const data: AuthUser = await graphQLClient.request(query);
     return data.me.posts;
-    // })
   } catch (err) {
     console.log(err);
   }

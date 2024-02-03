@@ -3,19 +3,16 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { getAuthUser } from "./api/queries";
-import { NotepadDataProvider } from "./providers/BlogDataProvider";
-import { NewPost, Note, Post } from "./types/Blog";
+import { BlogsDataProvider } from "./providers/BlogDataProvider";
+import { Post } from "./types/Blog";
 import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
-import { marked } from "marked";
 import ObjectID from "bson-objectid";
 import { createPostWebView } from "./ui/createPostWebView";
 
 export function activate(context: vscode.ExtensionContext) {
-  let notes: Post[] = [];
   let blogs: Post[] = [];
   let panel: vscode.WebviewPanel | undefined = undefined;
-  // const secrets = context["secrets"];
 
   const getWelcomeContent = async (token: any) => {
     if (token) {
@@ -61,22 +58,20 @@ export function activate(context: vscode.ExtensionContext) {
   const hashnodeToken = readData(context, "accessToken");
   getWelcomeContent(hashnodeToken);
 
-  const updateTreeView = (nodes: Object) => {};
-
-  const notepadDataProvider = new NotepadDataProvider(blogs);
+  const blogDataProvider = new BlogsDataProvider(blogs);
 
   // Create a tree view to contain the list of notepad notes
   const treeView = vscode.window.createTreeView(
     "hashnode-on-vscode.blogsList",
     {
-      treeDataProvider: notepadDataProvider,
+      treeDataProvider: blogDataProvider,
       showCollapseAll: false,
     }
   );
 
   // Command to render a webview-based note view
   const openBlog = vscode.commands.registerCommand(
-    "notepad.showNoteDetailView",
+    "hashnode-on-vscode.showPost",
     () => {
       const selectedTreeViewItem = treeView.selection[0];
       const matchingNote = blogs.find(
@@ -140,7 +135,6 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       if (accessToken) {
-        saveData(context, "accessToken", accessToken);
         const response = await getAuthUser(accessToken);
         if (response?.nodes) {
           saveData(context, "accessToken", accessToken);
@@ -178,7 +172,7 @@ export function activate(context: vscode.ExtensionContext) {
   const fetchBlog = vscode.commands.registerCommand(
     "hashnode-on-vscode.fetchBlog",
     () => {
-      notepadDataProvider.refresh(blogs);
+      blogDataProvider.refresh(blogs);
     }
   );
 

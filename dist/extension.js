@@ -43,10 +43,8 @@ const getWebView_1 = __webpack_require__(145);
 const bson_objectid_1 = __importDefault(__webpack_require__(149));
 const createPostWebView_1 = __webpack_require__(150);
 function activate(context) {
-    let notes = [];
     let blogs = [];
     let panel = undefined;
-    // const secrets = context["secrets"];
     const getWelcomeContent = async (token) => {
         if (token) {
             console.log("token: ", token);
@@ -78,15 +76,14 @@ function activate(context) {
     };
     const hashnodeToken = (0, globalState_1.readData)(context, "accessToken");
     getWelcomeContent(hashnodeToken);
-    const updateTreeView = (nodes) => { };
-    const notepadDataProvider = new BlogDataProvider_1.NotepadDataProvider(blogs);
+    const blogDataProvider = new BlogDataProvider_1.BlogsDataProvider(blogs);
     // Create a tree view to contain the list of notepad notes
     const treeView = vscode.window.createTreeView("hashnode-on-vscode.blogsList", {
-        treeDataProvider: notepadDataProvider,
+        treeDataProvider: blogDataProvider,
         showCollapseAll: false,
     });
     // Command to render a webview-based note view
-    const openBlog = vscode.commands.registerCommand("notepad.showNoteDetailView", () => {
+    const openBlog = vscode.commands.registerCommand("hashnode-on-vscode.showPost", () => {
         const selectedTreeViewItem = treeView.selection[0];
         const matchingNote = blogs.find((note) => note.id === selectedTreeViewItem.id);
         if (!matchingNote) {
@@ -124,7 +121,6 @@ function activate(context) {
             },
         });
         if (accessToken) {
-            (0, globalState_1.saveData)(context, "accessToken", accessToken);
             const response = await (0, queries_1.getAuthUser)(accessToken);
             if (response?.nodes) {
                 (0, globalState_1.saveData)(context, "accessToken", accessToken);
@@ -151,7 +147,7 @@ function activate(context) {
         }
     });
     const fetchBlog = vscode.commands.registerCommand("hashnode-on-vscode.fetchBlog", () => {
-        notepadDataProvider.refresh(blogs);
+        blogDataProvider.refresh(blogs);
     });
     const createBlog = vscode.commands.registerCommand("hashnode-on-vscode.createPost", () => {
         let postID = (0, bson_objectid_1.default)().toHexString();
@@ -244,7 +240,6 @@ const getAuthUser = async (token) => {
     try {
         const data = await graphQLClient.request(query);
         return data.me.posts;
-        // })
     }
     catch (err) {
         console.log(err);
@@ -25028,27 +25023,18 @@ function Complete(id) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.NotepadDataProvider = void 0;
+exports.BlogsDataProvider = void 0;
 const vscode_1 = __webpack_require__(1);
-/**
- * An implementation of the TreeDataProvider interface.
- *
- * This class is responsible for managing the tree data that the VS Code
- * TreeView API needs to render a custom tree view.
- *
- * Learn more about Tree Data Providers here:
- * https://code.visualstudio.com/api/extension-guides/tree-view#tree-data-provider
- */
-class NotepadDataProvider {
+class BlogsDataProvider {
     _onDidChangeTreeData = new vscode_1.EventEmitter();
     onDidChangeTreeData = this._onDidChangeTreeData.event;
     data;
     constructor(notesData) {
-        this.data = notesData.map((note) => new NotepadNote(note.id, note.title));
+        this.data = notesData.map((note) => new BlogPost(note.id, note.title));
     }
     refresh(notesData) {
         this._onDidChangeTreeData.fire();
-        this.data = notesData.map((note) => new NotepadNote(note.id, note.title));
+        this.data = notesData.map((note) => new BlogPost(note.id, note.title));
     }
     getTreeItem(element) {
         return element;
@@ -25063,16 +25049,16 @@ class NotepadDataProvider {
         return null;
     }
 }
-exports.NotepadDataProvider = NotepadDataProvider;
-class NotepadNote extends vscode_1.TreeItem {
+exports.BlogsDataProvider = BlogsDataProvider;
+class BlogPost extends vscode_1.TreeItem {
     children;
     constructor(noteId, noteTitle) {
         super(noteTitle);
         this.id = noteId;
         this.iconPath = new vscode_1.ThemeIcon("note");
         this.command = {
-            title: "Open note",
-            command: "notepad.showNoteDetailView",
+            title: "Open Post",
+            command: "hashnode-on-vscode.showPost",
         };
     }
 }
@@ -25108,19 +25094,6 @@ const getUri_1 = __webpack_require__(146);
 function getWebviewContent(webview, extensionUri, note) {
     const webviewUri = (0, getUri_1.getUri)(webview, extensionUri, ["dist", "webview.js"]);
     const styleUri = (0, getUri_1.getUri)(webview, extensionUri, ["dist", "style.css"]);
-    // console.log(note, "heh")
-    //   const formattedTags = note.tags ? note.tags.join(", ") : null;
-    // webview.onDidReceiveMessage((message) => {
-    //   const command = message.command;
-    //   switch (command) {
-    //     case "requestNoteData":
-    //       webview.postMessage({
-    //         command: "receiveDataInWebview",
-    //         payload: JSON.stringify(note),
-    //       });
-    //       break;
-    //   }
-    // });
     return /*html*/ `
     <!DOCTYPE html>
     <html lang="en">
@@ -25136,9 +25109,7 @@ function getWebviewContent(webview, extensionUri, note) {
         </header>
         <div><img src=${note.coverImage.url} /></div>
         <section >
-          <!-- <vscode-text-field id="title" value="${note.title}" placeholder="Enter a name">Title</vscode-text-field> !-->
           <div id="blog-content">${note?.content?.html}</div>
-          <!--<vscode-button id="submit-button">Save</vscode-button> !-->
         </section>
       
       </body>

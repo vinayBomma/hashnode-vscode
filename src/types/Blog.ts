@@ -1,13 +1,3 @@
-/**
- * Custom type declaration representing a Notepad note.
- */
-export type Note = {
-  id: string;
-  title: string;
-  content?: string | { html: string };
-  tags?: string[];
-};
-
 export type AuthUser = {
   me: {
     name: string;

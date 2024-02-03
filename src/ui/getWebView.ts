@@ -1,5 +1,5 @@
 import { Webview, Uri } from "vscode";
-import { Note, Post } from "../types/Blog";
+import { Post } from "../types/Blog";
 import { getUri } from "../utilities/getUri";
 
 export function getWebviewContent(
@@ -9,20 +9,7 @@ export function getWebviewContent(
 ) {
   const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
   const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
-  // console.log(note, "heh")
-  //   const formattedTags = note.tags ? note.tags.join(", ") : null;
 
-  // webview.onDidReceiveMessage((message) => {
-  //   const command = message.command;
-  //   switch (command) {
-  //     case "requestNoteData":
-  //       webview.postMessage({
-  //         command: "receiveDataInWebview",
-  //         payload: JSON.stringify(note),
-  //       });
-  //       break;
-  //   }
-  // });
   return /*html*/ `
     <!DOCTYPE html>
     <html lang="en">
@@ -38,9 +25,7 @@ export function getWebviewContent(
         </header>
         <div><img src=${note.coverImage.url} /></div>
         <section >
-          <!-- <vscode-text-field id="title" value="${note.title}" placeholder="Enter a name">Title</vscode-text-field> !-->
           <div id="blog-content">${note?.content?.html}</div>
-          <!--<vscode-button id="submit-button">Save</vscode-button> !-->
         </section>
       
       </body>

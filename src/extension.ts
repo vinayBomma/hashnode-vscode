@@ -9,6 +9,7 @@ import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
 import ObjectID from "bson-objectid";
 import { createPostWebView } from "./ui/createPostWebView";
+import { marked } from "marked";
 
 export function activate(context: vscode.ExtensionContext) {
   let blogs: Post[] = [];
@@ -69,7 +70,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Command to render a webview-based note view
   const openBlog = vscode.commands.registerCommand(
     "hashnode-on-vscode.showPost",
     () => {
@@ -214,15 +214,32 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       panel.webview.onDidReceiveMessage((message) => {
-        console.log("messages: ", message);
+        console.log("message: ", message);
         const command = message.command;
         const data = message.data;
         switch (command) {
           case "renderMarkdown":
-            console.log("the data: ", data);
+            panel = vscode.window.createWebviewPanel(
+              "markdown view",
+              "Markdown View",
+              vscode.ViewColumn.Two,
+              {
+                enableScripts: true,
+              }
+            );
+            const htmlText: string = marked(data).toString();
+            panel.webview.html = htmlText;
             break;
         }
       });
+
+      panel.onDidDispose(
+        () => {
+          panel = undefined;
+        },
+        null,
+        context.subscriptions
+      );
     }
   );
 

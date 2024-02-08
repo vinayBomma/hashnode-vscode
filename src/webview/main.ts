@@ -22,11 +22,12 @@ const vscode = acquireVsCodeApi();
 window.addEventListener("load", main);
 
 function main() {
-  const renderButton = document.getElementById("renderPost") as Button;
+  const renderButton = document.getElementById("renderMarkdown") as Button;
+  const markdownText = document.getElementById("content") as TextArea;
   renderButton.addEventListener("click", () => {
     vscode.postMessage({
       command: "renderMarkdown",
-      data: "test",
+      data: markdownText?.value,
     });
   });
 }

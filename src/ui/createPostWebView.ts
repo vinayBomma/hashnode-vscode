@@ -30,7 +30,8 @@ export function createPostWebView(
         <section id="notes-form">
           <vscode-text-field id="title" value="${note.title}" placeholder="Enter a name">Title</vscode-text-field>
           <vscode-text-area id="content"value="${note.content.markdown}" placeholder="Enter content in MarkDown!" resize="vertical" rows=15></vscode-text-area>
-          <vscode-button id="renderPost">Save</vscode-button>
+          <vscode-button id="renderMarkdown">Render Markdown</vscode-button>
+          <vscode-button id="submit-button">Save</vscode-button>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
       </body>

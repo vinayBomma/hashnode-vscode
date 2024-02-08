@@ -214,7 +214,7 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       panel.webview.onDidReceiveMessage((message) => {
-        console.log("message: ", message);
+        console.log("messages: ", message);
         const command = message.command;
         const data = message.data;
         switch (command) {

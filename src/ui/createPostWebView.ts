@@ -33,15 +33,6 @@ export function createPostWebView(
           <vscode-button id="renderPost">Save</vscode-button>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
-        <script>
-          const renderButton = document.getElementById("renderPost");
-          renderButton.addEventListener("click", () => {
-          vscode.postMessage({
-            command: 'renderMarkdown',
-            data: note
-          })
-        })
-        </script>
       </body>
     </html>
   `;

@@ -41,6 +41,11 @@
         "icon": "$(book)"
       },
       {
+        "command": "hashnode-on-vscode.search",
+        "title": "Hashnode: Search",
+        "icon": "$(search)"
+      },
+      {
         "command": "notepad.editNote",
         "title": "Notepad: Edit note",
         "icon": "$(edit)"
@@ -89,6 +94,10 @@
           "group": "navigation@1"
         },
         {
+          "command": "hashnode-on-vscode.search",
+          "group": "navigation@1"
+        },
+        {
           "command": "hashnode-on-vscode.showFeed",
           "group": "navigation@1"
         }
@@ -107,9 +116,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "watch": "webpack --watch",
-    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile": "node ./esbuild.js",
+    "package": "NODE_ENV=production node ./esbuild.js",
+    "watch": "node ./esbuild.js --watch",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
@@ -120,10 +129,12 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
     "@types/vscode": "^1.85.0",
+    "@types/vscode-webview": "^1.57.5",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vscode/test-cli": "^0.0.4",
     "@vscode/test-electron": "^2.3.8",
+    "esbuild": "^0.16.17",
     "eslint": "^8.56.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",

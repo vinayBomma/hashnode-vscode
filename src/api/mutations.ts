@@ -1,10 +1,8 @@
 import { GraphQLClient, gql } from "graphql-request";
 import { Post, PostBlog } from "../types/Blog";
-
 const apiEndpoint = "https://gql.hashnode.com";
 
-export const postBlog = async (input: PostBlog) => {
-  const { token } = input;
+export const postBlog = async (input: PostBlog, token: string) => {
   const graphQLClient = new GraphQLClient(apiEndpoint, {
     headers: {
       authorization: token,
@@ -30,7 +28,7 @@ export const postBlog = async (input: PostBlog) => {
   `;
 
   try {
-    const data: Post = await graphQLClient.request(mutation, input);
+    const data: Post = await graphQLClient.request(mutation, { input });
     console.log("data: ", data);
   } catch (err) {
     console.log("Errata: ", err);

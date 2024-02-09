@@ -32,7 +32,6 @@ export type PostBlog = {
   publicationId: string;
   coAuthors: string[];
   tags: {}[];
-  token: string;
 };
 
 export type AuthError<T = any> = {

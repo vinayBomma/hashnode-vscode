@@ -235,13 +235,12 @@ export function activate(context: vscode.ExtensionContext) {
             const postInput = {
               title: data?.title,
               contentMarkdown: data?.content,
-              publicationId: ObjectID().toHexString(),
-              tags: [{}],
-              coAuthors: [ObjectID().toHexString()],
-              token: hashnodeToken as string,
+              publicationId: "some_id",
+              tags: [{ name: "Private", slug: "private" }],
+              coAuthors: [],
             };
             console.log("post: ", postInput);
-            const response = postBlog(postInput);
+            const response = postBlog(postInput, hashnodeToken as string);
             break;
         }
       });

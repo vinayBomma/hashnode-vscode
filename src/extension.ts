@@ -10,6 +10,7 @@ import { getWebviewContent } from "./ui/getWebView";
 import ObjectID from "bson-objectid";
 import { createPostWebView } from "./ui/createPostWebView";
 import { marked } from "marked";
+import { postBlog } from "./api/mutations";
 
 export function activate(context: vscode.ExtensionContext) {
   let blogs: Post[] = [];
@@ -218,10 +219,10 @@ export function activate(context: vscode.ExtensionContext) {
         const command = message.command;
         const data = message.data;
         switch (command) {
-          case "renderMarkdown":
+          case "preview-blog":
             panel = vscode.window.createWebviewPanel(
-              "markdown view",
-              "Markdown View",
+              "Preview",
+              "Preview",
               vscode.ViewColumn.Two,
               {
                 enableScripts: true,
@@ -229,6 +230,18 @@ export function activate(context: vscode.ExtensionContext) {
             );
             const htmlText: string = marked(data).toString();
             panel.webview.html = htmlText;
+            break;
+          case "save-blog":
+            const postInput = {
+              title: data?.title,
+              contentMarkdown: data?.content,
+              publicationId: ObjectID().toHexString(),
+              tags: [{}],
+              coAuthors: [ObjectID().toHexString()],
+              token: hashnodeToken as string,
+            };
+            console.log("post: ", postInput);
+            const response = postBlog(postInput);
             break;
         }
       });

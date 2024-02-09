@@ -21,17 +21,14 @@ export function createPostWebView(
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" href="${styleUri}">
-          <title>${note.title}</title>
       </head>
       <body id="webview-body">
-        <header>
-          <h1>${note.title}</h1>
-        </header>
+      <header><h2>Create Blog Post</h2></header>
         <section id="notes-form">
-          <vscode-text-field id="title" value="${note.title}" placeholder="Enter a name">Title</vscode-text-field>
-          <vscode-text-area id="content"value="${note.content.markdown}" placeholder="Enter content in MarkDown!" resize="vertical" rows=15></vscode-text-area>
-          <vscode-button id="renderMarkdown">Render Markdown</vscode-button>
-          <vscode-button id="submit-button">Save</vscode-button>
+          <vscode-text-field id="title" value="" placeholder="Enter Blog Title">Title</vscode-text-field>
+          <vscode-text-area id="content"value="${note.content.markdown}" placeholder="Enter content in MarkDown" resize="vertical" rows=15>Content</vscode-text-area>
+          <vscode-button id="preview-blog">Preview</vscode-button>
+          <vscode-button id="submit-button">Publish</vscode-button>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
       </body>

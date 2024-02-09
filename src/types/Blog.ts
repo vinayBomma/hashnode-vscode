@@ -26,6 +26,15 @@ export type NewPost = {
   content: string;
 };
 
+export type PostBlog = {
+  title: string;
+  contentMarkdown: string;
+  publicationId: string;
+  coAuthors: string[];
+  tags: {}[];
+  token: string;
+};
+
 export type AuthError<T = any> = {
   response: {
     data: T;

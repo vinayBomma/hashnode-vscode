@@ -1,12 +1,12 @@
 import { Webview, Uri } from "vscode";
-import { Post } from "../types/Blog";
+import { NewPost } from "../types/Blog";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 
 export function createPostWebView(
   webview: Webview,
   extensionUri: Uri,
-  note: Post
+  blog: NewPost
 ) {
   const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
   const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
@@ -26,7 +26,7 @@ export function createPostWebView(
       <header><h2>Create Blog Post</h2></header>
         <section id="notes-form">
           <vscode-text-field id="title" value="" placeholder="Enter Blog Title">Title</vscode-text-field>
-          <vscode-text-area id="content"value="${note.content.markdown}" placeholder="Enter content in MarkDown" resize="vertical" rows=15>Content</vscode-text-area>
+          <vscode-text-area id="content"value="${blog.content}" placeholder="Enter content in MarkDown" resize="vertical" rows=15>Content</vscode-text-area>
           <vscode-button id="preview-blog">Preview</vscode-button>
           <vscode-button id="submit-button">Publish</vscode-button>
         </section>

@@ -18,6 +18,9 @@ export type Post = {
   coverImage: {
     url: string;
   };
+  publication: {
+    id: string;
+  };
 };
 
 export type NewPost = {

@@ -4,7 +4,7 @@
 import * as vscode from "vscode";
 import { getAuthUser } from "./api/queries";
 import { BlogsDataProvider } from "./providers/BlogDataProvider";
-import { Post } from "./types/Blog";
+import { NewPost, Post } from "./types/Blog";
 import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
 import ObjectID from "bson-objectid";
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
   const getWelcomeContent = async (token: any) => {
     if (token) {
       console.log("token: ", token);
-      const response = await getAuthUser(token);
+      const response = await getAuthUser(context, token);
       if (response?.nodes) {
         vscode.commands.executeCommand(
           "setContext",
@@ -37,6 +37,9 @@ export function activate(context: vscode.ExtensionContext) {
             },
             coverImage: {
               url: node.coverImage.url,
+            },
+            publication: {
+              id: node.publication.id,
             },
           };
           blogs.push(newBlog);
@@ -136,7 +139,7 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       if (accessToken) {
-        const response = await getAuthUser(accessToken);
+        const response = await getAuthUser(context, accessToken);
         if (response?.nodes) {
           saveData(context, "accessToken", accessToken);
           vscode.window.showInformationMessage("Access Token stored securely!");
@@ -157,6 +160,9 @@ export function activate(context: vscode.ExtensionContext) {
               },
               coverImage: {
                 url: node.coverImage.url,
+              },
+              publication: {
+                id: node.publication.id,
               },
             };
             blogs.push(newBlog);
@@ -181,16 +187,10 @@ export function activate(context: vscode.ExtensionContext) {
     "hashnode-on-vscode.createPost",
     () => {
       let postID = ObjectID().toHexString();
-      const newPost: Post = {
+      const newPost: NewPost = {
         id: postID,
         title: "New Blog",
-        content: {
-          html: "",
-          markdown: "",
-        },
-        coverImage: {
-          url: "test",
-        },
+        content: "",
       };
 
       if (!panel) {
@@ -232,10 +232,11 @@ export function activate(context: vscode.ExtensionContext) {
             panel.webview.html = htmlText;
             break;
           case "save-blog":
+            const publicationId = readData(context, "publicationId");
             const postInput = {
               title: data?.title,
               contentMarkdown: data?.content,
-              publicationId: "some_id",
+              publicationId: publicationId as string,
               tags: [{ name: "Private", slug: "private" }],
               coAuthors: [],
             };

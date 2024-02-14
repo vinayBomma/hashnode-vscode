@@ -34,7 +34,7 @@ export type PostBlog = {
   contentMarkdown: string;
   publicationId: string;
   coAuthors: string[];
-  tags: {}[];
+  tags: { name: string; slug: string }[];
 };
 
 export type AuthError<T = any> = {

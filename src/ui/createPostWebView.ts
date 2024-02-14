@@ -23,10 +23,11 @@ export function createPostWebView(
           <link rel="stylesheet" href="${styleUri}">
       </head>
       <body id="webview-body">
-      <header><h2>Create Blog Post</h2></header>
+      <header><h2>Create New Post</h2></header>
         <section id="notes-form">
           <vscode-text-field id="title" value="" placeholder="Enter Blog Title">Title</vscode-text-field>
           <vscode-text-area id="content"value="${blog.content}" placeholder="Enter content in MarkDown" resize="vertical" rows=15>Content</vscode-text-area>
+          <vscode-text-field id="tags" placeholder="Enter tags separated by comma">Tags</vscode-text-field>
           <vscode-button id="preview-blog">Preview</vscode-button>
           <vscode-button id="submit-button">Publish</vscode-button>
         </section>

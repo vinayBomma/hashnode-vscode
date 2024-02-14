@@ -27,7 +27,7 @@
       },
       {
         "command": "hashnode-on-vscode.fetchBlog",
-        "title": "Hashnode: Fetch Blog",
+        "title": "Hashnode: Fetch Blog Posts",
         "icon": "$(add)"
       },
       {
@@ -47,12 +47,12 @@
       },
       {
         "command": "notepad.editNote",
-        "title": "Notepad: Edit note",
+        "title": "Notepad: Edit Post",
         "icon": "$(edit)"
       },
       {
         "command": "notepad.deleteNote",
-        "title": "Notepad: Delete note",
+        "title": "Notepad: Delete Post",
         "icon": "$(trash)"
       }
     ],
@@ -79,7 +79,7 @@
       {
         "view": "hashnode-on-vscode.blogsList",
         "when": "hashnode-on-vscode.getWelcomeContent",
-        "contents": "Access Token Found \n[Fetch Blog](command:hashnode-on-vscode.fetchBlog)"
+        "contents": "Access Token Found \n[Fetch Blog Posts](command:hashnode-on-vscode.fetchBlog)"
       },
       {
         "view": "hashnode-on-vscode.blogsList",

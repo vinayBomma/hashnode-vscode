@@ -82,7 +82,7 @@ export function activate(context: vscode.ExtensionContext) {
         (note) => note.id === selectedTreeViewItem.id
       );
       if (!matchingNote) {
-        vscode.window.showErrorMessage("No matching note found");
+        vscode.window.showErrorMessage("No matching post found");
         return;
       }
 
@@ -232,16 +232,28 @@ export function activate(context: vscode.ExtensionContext) {
             panel.webview.html = htmlText;
             break;
           case "save-blog":
-            const publicationId = readData(context, "publicationId");
-            const postInput = {
-              title: data?.title,
-              contentMarkdown: data?.content,
-              publicationId: publicationId as string,
-              tags: [{ name: "Private", slug: "private" }],
-              coAuthors: [],
-            };
-            console.log("post: ", postInput);
-            const response = postBlog(postInput, hashnodeToken as string);
+            if (data.title !== "" && data.content !== "" && data.tags !== "") {
+              const publicationId = readData(context, "publicationId");
+              const tags = data.tags.split(",");
+              const tagsArray: { name: string; slug: string }[] = [];
+              tags.map((tag: string) => {
+                tagsArray.push({
+                  name: tag,
+                  slug: tag,
+                });
+              });
+              const postInput = {
+                title: data.title,
+                contentMarkdown: data.content,
+                publicationId: publicationId as string,
+                tags: tagsArray,
+                coAuthors: [],
+              };
+              console.log("post: ", postInput);
+              const response = postBlog(postInput, hashnodeToken as string);
+            } else {
+              vscode.window.showErrorMessage("Please fill all the fields");
+            }
             break;
         }
       });

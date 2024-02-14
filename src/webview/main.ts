@@ -41,10 +41,15 @@ function savePost() {
   const submitButton = document.getElementById("submit-button") as Button;
   const content = document.getElementById("content") as TextArea;
   const title = document.getElementById("title") as TextField;
+  const tags = document.getElementById("tags") as TextField;
   submitButton.addEventListener("click", () => {
     vscode.postMessage({
       command: "save-blog",
-      data: { title: title?.value, content: content?.value },
+      data: {
+        title: title?.value,
+        content: content?.value,
+        tags: tags?.value,
+      },
     });
   });
 }

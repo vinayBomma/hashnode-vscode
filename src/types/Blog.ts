@@ -24,9 +24,10 @@ export type Post = {
 };
 
 export type NewPost = {
-  id: string;
+  id?: string;
   title: string;
   content: string;
+  tags?: string;
 };
 
 export type PostBlog = {

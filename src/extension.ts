@@ -9,8 +9,9 @@ import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
 import ObjectID from "bson-objectid";
 import { createPostWebView } from "./ui/createPostWebView";
-import { marked } from "marked";
 import { postBlog } from "./api/mutations";
+import { previewPostWebView } from "./ui/previewPostWebView";
+import { marked } from "marked";
 
 export function activate(context: vscode.ExtensionContext) {
   let blogs: Post[] = [];
@@ -207,7 +208,6 @@ export function activate(context: vscode.ExtensionContext) {
         );
       }
 
-      panel.title = newPost.title;
       panel.webview.html = createPostWebView(
         panel.webview,
         context.extensionUri,
@@ -228,8 +228,13 @@ export function activate(context: vscode.ExtensionContext) {
                 enableScripts: true,
               }
             );
-            const htmlText: string = marked(data).toString();
-            panel.webview.html = htmlText;
+            let markdownText = marked(message?.data?.content)?.toString();
+            message.data.content = markdownText;
+            panel.webview.html = previewPostWebView(
+              panel.webview,
+              context.extensionUri,
+              message.data
+            );
             break;
           case "save-blog":
             if (data.title !== "" && data.content !== "" && data.tags !== "") {

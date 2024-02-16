@@ -27,12 +27,18 @@ function main() {
 }
 
 function previewPost() {
-  const renderButton = document.getElementById("preview-blog") as Button;
-  const markdownText = document.getElementById("content") as TextArea;
-  renderButton.addEventListener("click", () => {
+  const previewButton = document.getElementById("preview-blog") as Button;
+  const content = document.getElementById("content") as TextArea;
+  const title = document.getElementById("title") as TextField;
+  const tags = document.getElementById("tags") as TextField;
+  previewButton.addEventListener("click", () => {
     vscode.postMessage({
       command: "preview-blog",
-      data: markdownText?.value,
+      data: {
+        title: title?.value,
+        content: content?.value,
+        tags: tags?.value,
+      },
     });
   });
 }

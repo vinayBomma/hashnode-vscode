@@ -15,7 +15,6 @@ import { marked } from "marked";
 
 export function activate(context: vscode.ExtensionContext) {
   let blogs: Post[] = [];
-  let panel: vscode.WebviewPanel | undefined = undefined;
 
   const getWelcomeContent = async (token: any) => {
     if (token) {
@@ -66,7 +65,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   const blogDataProvider = new BlogsDataProvider(blogs);
 
-  // Create a tree view to contain the list of notepad notes
   const treeView = vscode.window.createTreeView(
     "hashnode-on-vscode.blogsList",
     {
@@ -79,19 +77,18 @@ export function activate(context: vscode.ExtensionContext) {
     "hashnode-on-vscode.showPost",
     () => {
       const selectedTreeViewItem = treeView.selection[0];
-      const matchingNote = blogs.find(
-        (note) => note.id === selectedTreeViewItem.id
+      const blogPost = blogs.find(
+        (post) => post.id === selectedTreeViewItem.id
       );
-      if (!matchingNote) {
+      if (!blogPost) {
         vscode.window.showErrorMessage("No matching post found");
         return;
       }
 
-      // If no panel is open, create a new one and update the HTML
-      if (!panel) {
-        panel = vscode.window.createWebviewPanel(
+      let blogViewPanel: vscode.WebviewPanel | undefined =
+        vscode.window.createWebviewPanel(
           "blogView",
-          matchingNote.title,
+          blogPost.title,
           vscode.ViewColumn.One,
           {
             enableScripts: true,
@@ -100,19 +97,17 @@ export function activate(context: vscode.ExtensionContext) {
             ],
           }
         );
-      }
 
-      // If a panel is open, update the HTML with the selected item's content
-      panel.title = matchingNote.title;
-      panel.webview.html = getWebviewContent(
-        panel.webview,
+      blogViewPanel.title = blogPost.title;
+      blogViewPanel.webview.html = getWebviewContent(
+        blogViewPanel.webview,
         context.extensionUri,
-        matchingNote
+        blogPost
       );
 
-      panel.onDidDispose(
+      blogViewPanel.onDidDispose(
         () => {
-          panel = undefined;
+          blogViewPanel = undefined;
         },
         null,
         context.subscriptions
@@ -194,8 +189,8 @@ export function activate(context: vscode.ExtensionContext) {
         content: "",
       };
 
-      if (!panel) {
-        panel = vscode.window.createWebviewPanel(
+      let createPostPanel: vscode.WebviewPanel | undefined =
+        vscode.window.createWebviewPanel(
           "createPostView",
           newPost.title,
           vscode.ViewColumn.One,
@@ -206,21 +201,22 @@ export function activate(context: vscode.ExtensionContext) {
             ],
           }
         );
-      }
 
-      panel.webview.html = createPostWebView(
-        panel.webview,
+      createPostPanel.webview.html = createPostWebView(
+        createPostPanel.webview,
         context.extensionUri,
         newPost
       );
 
-      panel.webview.onDidReceiveMessage((message) => {
+      createPostPanel.webview.onDidReceiveMessage((message) => {
         console.log("message: ", message);
         const command = message.command;
         const data = message.data;
         switch (command) {
           case "preview-blog":
-            panel = vscode.window.createWebviewPanel(
+            let previewPostPanel: vscode.WebviewPanel | undefined = undefined;
+
+            previewPostPanel = vscode.window.createWebviewPanel(
               "Preview",
               "Preview",
               vscode.ViewColumn.Two,
@@ -230,8 +226,8 @@ export function activate(context: vscode.ExtensionContext) {
             );
             let markdownText = marked(message?.data?.content)?.toString();
             message.data.content = markdownText;
-            panel.webview.html = previewPostWebView(
-              panel.webview,
+            previewPostPanel.webview.html = previewPostWebView(
+              previewPostPanel.webview,
               context.extensionUri,
               message.data
             );
@@ -256,6 +252,7 @@ export function activate(context: vscode.ExtensionContext) {
               };
               console.log("post: ", postInput);
               const response = postBlog(postInput, hashnodeToken as string);
+              createPostPanel?.dispose();
             } else {
               vscode.window.showErrorMessage("Please fill all the fields");
             }
@@ -263,9 +260,9 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
 
-      panel.onDidDispose(
+      createPostPanel.onDidDispose(
         () => {
-          panel = undefined;
+          createPostPanel = undefined;
         },
         null,
         context.subscriptions

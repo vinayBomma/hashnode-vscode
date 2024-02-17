@@ -9,15 +9,16 @@
   grid-row-gap: 1.5rem;
 }
 
-#submit-button {
-  width: fit-content;
+#buttons {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
 }
 
-#tags-container {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  grid-column-gap: 0.5rem;
+#preview-blog,
+#submit-button {
+  width: 50%;
+  margin: 0 2%;
 }
 
 #blog-content {

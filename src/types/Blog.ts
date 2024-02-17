@@ -8,6 +8,12 @@ export type AuthUser = {
   };
 };
 
+export type PostData = {
+  publishPost: {
+    post: Post;
+  };
+};
+
 export type Post = {
   id: string;
   title: string;
@@ -15,7 +21,7 @@ export type Post = {
     html: any;
     markdown: string;
   };
-  coverImage: {
+  coverImage?: {
     url: string;
   };
   publication: {

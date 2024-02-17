@@ -23,11 +23,12 @@ export function getWebviewContent(
         <header>
           <h1>${note.title}</h1>
         </header>
-        <div><img src=${note.coverImage.url} /></div>
-        <section >
+        <div>${
+          note?.coverImage?.url ? `<img src="${note.coverImage.url}" />` : ""
+        }</div>
+        <section>
           <div id="blog-content">${note?.content?.html}</div>
         </section>
-      
       </body>
     </html>
   `;

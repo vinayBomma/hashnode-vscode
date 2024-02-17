@@ -36,14 +36,9 @@
         "icon": "$(add)"
       },
       {
-        "command": "hashnode-on-vscode.showFeed",
-        "title": "Hashnode: Show Feed",
-        "icon": "$(book)"
-      },
-      {
-        "command": "hashnode-on-vscode.search",
-        "title": "Hashnode: Search",
-        "icon": "$(search)"
+        "command": "hashnode-on-vscode.refreshBlog",
+        "title": "Hashnode: Refresh Blog",
+        "icon": "$(refresh)"
       },
       {
         "command": "notepad.editNote",
@@ -94,11 +89,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "hashnode-on-vscode.search",
-          "group": "navigation@1"
-        },
-        {
-          "command": "hashnode-on-vscode.showFeed",
+          "command": "hashnode-on-vscode.refreshBlog",
           "group": "navigation@1"
         }
       ],

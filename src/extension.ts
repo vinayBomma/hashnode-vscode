@@ -29,17 +29,17 @@ export function activate(context: vscode.ExtensionContext) {
 
         response?.nodes.forEach((node) => {
           const newBlog: Post = {
-            id: node.id,
-            title: node.title,
+            id: node?.id,
+            title: node?.title,
             content: {
-              html: node.content.html,
-              markdown: node.content.markdown,
+              html: node?.content?.html,
+              markdown: node?.content?.markdown,
             },
             coverImage: {
-              url: node.coverImage.url,
+              url: node?.coverImage?.url ?? "",
             },
             publication: {
-              id: node.publication.id,
+              id: node?.publication?.id,
             },
           };
           blogs.push(newBlog);
@@ -148,17 +148,17 @@ export function activate(context: vscode.ExtensionContext) {
 
           response?.nodes.forEach((node) => {
             const newBlog: Post = {
-              id: node.id,
-              title: node.title,
+              id: node?.id,
+              title: node?.title,
               content: {
-                html: node.content.html,
-                markdown: node.content.markdown,
+                html: node?.content?.html,
+                markdown: node?.content?.markdown,
               },
               coverImage: {
-                url: node.coverImage.url,
+                url: node?.coverImage?.url ?? "",
               },
               publication: {
-                id: node.publication.id,
+                id: node?.publication?.id,
               },
             };
             blogs.push(newBlog);
@@ -208,7 +208,7 @@ export function activate(context: vscode.ExtensionContext) {
         newPost
       );
 
-      createPostPanel.webview.onDidReceiveMessage((message) => {
+      createPostPanel.webview.onDidReceiveMessage(async (message) => {
         console.log("message: ", message);
         const command = message.command;
         const data = message.data;
@@ -233,7 +233,12 @@ export function activate(context: vscode.ExtensionContext) {
             );
             break;
           case "save-blog":
-            if (data.title !== "" && data.content !== "" && data.tags !== "") {
+            if (
+              data.title !== "" &&
+              data.content !== "" &&
+              data.tags !== "" &&
+              data.title.length > 6
+            ) {
               const publicationId = readData(context, "publicationId");
               const tags = data.tags.split(",");
               const tagsArray: { name: string; slug: string }[] = [];
@@ -251,8 +256,48 @@ export function activate(context: vscode.ExtensionContext) {
                 coAuthors: [],
               };
               console.log("post: ", postInput);
-              const response = postBlog(postInput, hashnodeToken as string);
-              createPostPanel?.dispose();
+
+              const confirmation = await vscode.window.showInputBox({
+                prompt: "Are you sure you want to publish post to Hashnode?",
+                title: "Enter YES to Publish Post",
+                validateInput: (input) => {
+                  if (!input) {
+                    return "Please enter a value.";
+                  }
+
+                  return null;
+                },
+              });
+              if (confirmation === "YES") {
+                const response = await postBlog(
+                  postInput,
+                  hashnodeToken as string
+                );
+                if (response) {
+                  const newPost: Post = {
+                    id: response?.id,
+                    title: response?.title,
+                    content: {
+                      html: response?.content.html,
+                      markdown: response?.content.markdown,
+                    },
+                    coverImage: {
+                      url: response?.coverImage?.url ?? "",
+                    },
+                    publication: {
+                      id: response?.publication?.id,
+                    },
+                  };
+                  blogs.unshift(newPost);
+                  blogDataProvider.refresh(blogs);
+                }
+                vscode.window.showInformationMessage(
+                  "Post Published Successfully"
+                );
+                createPostPanel?.dispose();
+              } else {
+                vscode.window.showErrorMessage("Post Not Published");
+              }
             } else {
               vscode.window.showErrorMessage("Please fill all the fields");
             }

@@ -1,5 +1,5 @@
 import { GraphQLClient, gql } from "graphql-request";
-import { Post, PostBlog } from "../types/Blog";
+import { PostBlog, PostData } from "../types/Blog";
 const apiEndpoint = "https://gql.hashnode.com";
 
 export const postBlog = async (input: PostBlog, token: string) => {
@@ -22,14 +22,17 @@ export const postBlog = async (input: PostBlog, token: string) => {
           coverImage {
             url
           }
+          publication {
+            id
+          }
         }
       }
     }
   `;
 
   try {
-    const data: Post = await graphQLClient.request(mutation, { input });
-    console.log("data: ", data);
+    const data: PostData = await graphQLClient.request(mutation, { input });
+    return data?.publishPost?.post;
   } catch (err) {
     console.log("Errata: ", err);
   }

@@ -10,7 +10,6 @@ export function createPostWebView(
 ) {
   const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
   const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
-
   const nonce = getNonce();
 
   return /*html*/ `
@@ -25,11 +24,13 @@ export function createPostWebView(
       <body id="webview-body">
       <header><h2>Create New Post</h2></header>
         <section id="notes-form">
-          <vscode-text-field id="title" value="" placeholder="Enter Title">Title</vscode-text-field>
+          <vscode-text-field id="title" value="" placeholder="Enter title more than 6 characters">Title</vscode-text-field>
           <vscode-text-area id="content"value="${blog.content}" placeholder="Enter content in Markdown" resize="vertical" rows=15>Content</vscode-text-area>
           <vscode-text-field id="tags" placeholder="Enter tags separated by comma">Tags</vscode-text-field>
-          <vscode-button id="preview-blog">Preview</vscode-button>
-          <vscode-button id="submit-button">Publish</vscode-button>
+          <div id="buttons">
+          <vscode-button id="preview-blog">Preview Post</vscode-button>
+          <vscode-button id="submit-button">Publish Post</span></vscode-button>
+          </div>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
       </body>

@@ -17,13 +17,17 @@ export class BlogsDataProvider implements TreeDataProvider<BlogPost> {
 
   data: BlogPost[];
 
-  constructor(notesData: Post[]) {
-    this.data = notesData.map((note) => new BlogPost(note.id, note.title));
+  constructor(blogData: Post[]) {
+    this.data = blogData.map(
+      (post) => new BlogPost(post.id, post.title, post?.content?.markdown)
+    );
   }
 
-  refresh(notesData: Post[]): void {
+  refresh(blogData: Post[]): void {
     this._onDidChangeTreeData.fire();
-    this.data = notesData.map((note) => new BlogPost(note.id, note.title));
+    this.data = blogData.map(
+      (post) => new BlogPost(post.id, post.title, post?.content?.markdown)
+    );
   }
 
   getTreeItem(element: BlogPost): TreeItem | Thenable<TreeItem> {
@@ -45,13 +49,14 @@ export class BlogsDataProvider implements TreeDataProvider<BlogPost> {
 class BlogPost extends TreeItem {
   children?: BlogPost[];
 
-  constructor(noteId: string, noteTitle: string) {
-    super(noteTitle);
-    this.id = noteId;
+  constructor(postId: string, postTitle: string, postContent: string) {
+    super(postTitle);
+    this.id = postId;
     this.iconPath = new ThemeIcon("note");
     this.command = {
       title: "Open Post",
       command: "hashnode-on-vscode.showPost",
+      arguments: [postContent],
     };
   }
 }

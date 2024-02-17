@@ -3,6 +3,10 @@
   flex-direction: column;
 }
 
+#header-title {
+  text-align: center;
+}
+
 #notes-form {
   display: grid;
   grid-auto-flow: row;

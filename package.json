@@ -41,13 +41,13 @@
         "icon": "$(refresh)"
       },
       {
-        "command": "notepad.editNote",
-        "title": "Notepad: Edit Post",
+        "command": "hashnode-on-vscode.editPost",
+        "title": "Hashnode: Edit Post",
         "icon": "$(edit)"
       },
       {
-        "command": "notepad.deleteNote",
-        "title": "Notepad: Delete Post",
+        "command": "hashnode-on-vscode.deletePost",
+        "title": "Hashnode: Delete Post",
         "icon": "$(trash)"
       }
     ],
@@ -95,11 +95,11 @@
       ],
       "view/item/context": [
         {
-          "command": "notepad.editNote",
+          "command": "hashnode-on-vscode.editPost",
           "group": "inline"
         },
         {
-          "command": "notepad.deleteNote",
+          "command": "hashnode-on-vscode.deletePost",
           "group": "inline"
         }
       ]

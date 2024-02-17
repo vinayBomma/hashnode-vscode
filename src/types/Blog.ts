@@ -14,6 +14,12 @@ export type PostData = {
   };
 };
 
+export type UpdatePostData = {
+  updatePost: {
+    post: Post;
+  };
+};
+
 export type Post = {
   id: string;
   title: string;

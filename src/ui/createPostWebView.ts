@@ -6,7 +6,8 @@ import { getNonce } from "../utilities/getNonce";
 export function createPostWebView(
   webview: Webview,
   extensionUri: Uri,
-  blog: NewPost
+  blog: NewPost,
+  isUpdate: boolean
 ) {
   const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
   const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
@@ -18,18 +19,29 @@ export function createPostWebView(
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
+            webview.cspSource
+          }; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" href="${styleUri}">
       </head>
       <body id="webview-body">
-      <header><h2>Create New Post</h2></header>
+      <input type="hidden" id="blog-id" value="${blog.id}" />
+      <header><h2 id="header-title">${
+        isUpdate ? "Update Post" : "New Post"
+      }</h2></header>
         <section id="notes-form">
-          <vscode-text-field id="title" value="" placeholder="Enter title more than 6 characters">Title</vscode-text-field>
-          <vscode-text-area id="content"value="${blog.content}" placeholder="Enter content in Markdown" resize="vertical" rows=15>Content</vscode-text-area>
+          <vscode-text-field id="title" value="${
+            isUpdate ? blog.title : ""
+          }" placeholder="Enter title more than 6 characters">Title</vscode-text-field>
+          <vscode-text-area id="content"value="${
+            blog.content
+          }" placeholder="Enter content in Markdown" resize="vertical" rows=25>Content</vscode-text-area>
           <vscode-text-field id="tags" placeholder="Enter tags separated by comma">Tags</vscode-text-field>
           <div id="buttons">
           <vscode-button id="preview-blog">Preview Post</vscode-button>
-          <vscode-button id="submit-button">Publish Post</span></vscode-button>
+          <vscode-button id="submit-button">${
+            isUpdate ? "Update Post" : "Publish Post"
+          }</vscode-button>
           </div>
         </section>
         <script type="module" nonce="${nonce}" src="${webviewUri}"></script>

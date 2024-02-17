@@ -1,5 +1,5 @@
 import { GraphQLClient, gql } from "graphql-request";
-import { PostBlog, PostData } from "../types/Blog";
+import { PostBlog, PostData, UpdatePostData } from "../types/Blog";
 const apiEndpoint = "https://gql.hashnode.com";
 
 export const postBlog = async (input: PostBlog, token: string) => {
@@ -33,6 +33,69 @@ export const postBlog = async (input: PostBlog, token: string) => {
   try {
     const data: PostData = await graphQLClient.request(mutation, { input });
     return data?.publishPost?.post;
+  } catch (err) {
+    console.log("Errata: ", err);
+  }
+};
+
+export const updateBlog = async (input: PostBlog, token: string) => {
+  const graphQLClient = new GraphQLClient(apiEndpoint, {
+    headers: {
+      authorization: token,
+    },
+  });
+
+  const mutation = gql`
+    mutation UpdatePost($input: UpdatePostInput!) {
+      updatePost(input: $input) {
+        post {
+          id
+          title
+          content {
+            html
+            markdown
+          }
+          coverImage {
+            url
+          }
+          publication {
+            id
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const data: UpdatePostData = await graphQLClient.request(mutation, {
+      input,
+    });
+    return data?.updatePost?.post;
+  } catch (err) {
+    console.log("Errata: ", err);
+  }
+};
+
+export const removeBlog = async (input: string, token: string) => {
+  const graphQLClient = new GraphQLClient(apiEndpoint, {
+    headers: {
+      authorization: token,
+    },
+  });
+
+  const mutation = gql`
+    mutation RemovePost($input: RemovePostInput!) {
+      removePost(input: $input){
+        
+      }
+    }
+  `;
+
+  try {
+    const data = await graphQLClient.request(mutation, {
+      input,
+    });
+    return data;
   } catch (err) {
     console.log("Errata: ", err);
   }

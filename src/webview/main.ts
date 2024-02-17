@@ -48,10 +48,12 @@ function savePost() {
   const content = document.getElementById("content") as TextArea;
   const title = document.getElementById("title") as TextField;
   const tags = document.getElementById("tags") as TextField;
+  const id = document.getElementById("blog-id") as TextField;
   submitButton.addEventListener("click", () => {
     vscode.postMessage({
       command: "save-blog",
       data: {
+        id: id?.value,
         title: title?.value,
         content: content?.value,
         tags: tags?.value,

@@ -9,7 +9,7 @@ import { readData, saveData } from "./utilities/globalState";
 import { getWebviewContent } from "./ui/getWebView";
 import ObjectID from "bson-objectid";
 import { createPostWebView } from "./ui/createPostWebView";
-import { postBlog, updateBlog } from "./api/mutations";
+import { postBlog, removeBlog, updateBlog } from "./api/mutations";
 import { previewPostWebView } from "./ui/previewPostWebView";
 import { marked } from "marked";
 
@@ -379,11 +379,44 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const deleteBlog = vscode.commands.registerCommand(
+    "hashnode-on-vscode.deletePost",
+    async (node) => {
+      if (node) {
+        const confirmation = await vscode.window.showInputBox({
+          prompt: "Are you sure you want to delete this post?",
+          title: "Enter DELETE to remove Post",
+          validateInput: (input) => {
+            if (!input) {
+              return "Please enter a value.";
+            }
+
+            return null;
+          },
+        });
+        if (confirmation === "DELETE") {
+          const response = await removeBlog(
+            { id: node?.id },
+            hashnodeToken as string
+          );
+          if (response?.id) {
+            blogs = blogs.filter((blog) => blog?.id !== node?.id);
+            blogDataProvider.refresh(blogs);
+            vscode.window.showInformationMessage("Post Deleted Successfully");
+          }
+        } else {
+          vscode.window.showErrorMessage("Post couldn't be deleted");
+        }
+      }
+    }
+  );
+
   context.subscriptions.push(addToken);
   context.subscriptions.push(fetchBlog);
   context.subscriptions.push(createBlog);
   context.subscriptions.push(openBlog);
   context.subscriptions.push(editBlog);
+  context.subscriptions.push(deleteBlog);
 }
 
 export function deactivate() {}

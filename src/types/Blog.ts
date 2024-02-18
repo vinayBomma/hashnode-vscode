@@ -42,6 +42,16 @@ export type NewPost = {
   tags?: string;
 };
 
+export type DeletePost = {
+  removePost: {
+    post: Post;
+  };
+};
+
+export type DeleteBlog = {
+  id: string;
+};
+
 export type PostBlog = {
   title: string;
   contentMarkdown: string;

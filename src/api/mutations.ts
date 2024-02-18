@@ -1,5 +1,11 @@
 import { GraphQLClient, gql } from "graphql-request";
-import { PostBlog, PostData, UpdatePostData } from "../types/Blog";
+import {
+  DeleteBlog,
+  DeletePost,
+  PostBlog,
+  PostData,
+  UpdatePostData,
+} from "../types/Blog";
 const apiEndpoint = "https://gql.hashnode.com";
 
 export const postBlog = async (input: PostBlog, token: string) => {
@@ -76,7 +82,7 @@ export const updateBlog = async (input: PostBlog, token: string) => {
   }
 };
 
-export const removeBlog = async (input: string, token: string) => {
+export const removeBlog = async (input: DeleteBlog, token: string) => {
   const graphQLClient = new GraphQLClient(apiEndpoint, {
     headers: {
       authorization: token,
@@ -85,17 +91,19 @@ export const removeBlog = async (input: string, token: string) => {
 
   const mutation = gql`
     mutation RemovePost($input: RemovePostInput!) {
-      removePost(input: $input){
-        
+      removePost(input: $input) {
+        post {
+          id
+        }
       }
     }
   `;
 
   try {
-    const data = await graphQLClient.request(mutation, {
+    const data: DeletePost = await graphQLClient.request(mutation, {
       input,
     });
-    return data;
+    return data.removePost?.post;
   } catch (err) {
     console.log("Errata: ", err);
   }

@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
           token
         );
 
-        response?.nodes.forEach((node) => {
+        response?.nodes.forEach((node: Post) => {
           const newBlog: Post = {
             id: node?.id,
             title: node?.title,
@@ -40,6 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
             publication: {
               id: node?.publication?.id,
             },
+            views: node?.views,
+            readTimeInMinutes: node?.readTimeInMinutes,
           };
           blogs.push(newBlog);
         });
@@ -59,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   };
 
-  const hashnodeToken = readData(context, "accessToken");
+  let hashnodeToken = readData(context, "accessToken");
   getWelcomeContent(hashnodeToken as string);
 
   const blogDataProvider = new BlogsDataProvider(blogs);
@@ -136,6 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (accessToken) {
         const response = await getAuthUser(context, accessToken);
         if (response?.nodes) {
+          hashnodeToken = accessToken;
           saveData(context, "accessToken", accessToken);
           vscode.window.showInformationMessage("Access Token stored securely!");
 
@@ -145,7 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
             accessToken
           );
 
-          response?.nodes.forEach((node) => {
+          response?.nodes.forEach((node: Post) => {
             const newBlog: Post = {
               id: node?.id,
               title: node?.title,
@@ -159,6 +162,8 @@ export function activate(context: vscode.ExtensionContext) {
               publication: {
                 id: node?.publication?.id,
               },
+              views: node?.views,
+              readTimeInMinutes: node?.readTimeInMinutes,
             };
             blogs.push(newBlog);
           });
@@ -271,6 +276,8 @@ export function activate(context: vscode.ExtensionContext) {
                 publication: {
                   id: response?.publication?.id,
                 },
+                views: response?.views,
+                readTimeInMinutes: response?.readTimeInMinutes,
               };
               if (isUpdate) {
                 blogs = blogs.filter((blog) => blog.id !== data.id);

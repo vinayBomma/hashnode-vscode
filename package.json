@@ -14,10 +14,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "hashnode-on-vscode.getHashnode",
-        "title": "Hey HN"
-      },
-      {
         "command": "hashnode-on-vscode.addToken",
         "title": "Hashnode: Add Token"
       },
@@ -36,9 +32,9 @@
         "icon": "$(add)"
       },
       {
-        "command": "hashnode-on-vscode.refreshBlog",
-        "title": "Hashnode: Refresh Blog",
-        "icon": "$(refresh)"
+        "command": "hashnode-on-vscode.about",
+        "title": "Hashnode: Show Information",
+        "icon": "$(info)"
       },
       {
         "command": "hashnode-on-vscode.editPost",
@@ -89,7 +85,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "hashnode-on-vscode.refreshBlog",
+          "command": "hashnode-on-vscode.about",
           "group": "navigation@1"
         }
       ],

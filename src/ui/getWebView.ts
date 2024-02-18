@@ -5,9 +5,8 @@ import { getUri } from "../utilities/getUri";
 export function getWebviewContent(
   webview: Webview,
   extensionUri: Uri,
-  note: Post
+  post: Post
 ) {
-  const webviewUri = getUri(webview, extensionUri, ["dist", "webview.js"]);
   const styleUri = getUri(webview, extensionUri, ["dist", "style.css"]);
 
   return /*html*/ `
@@ -17,17 +16,24 @@ export function getWebviewContent(
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="${styleUri}">
-          <title>${note.title}</title>
+          <title>${post.title}</title>
       </head>
       <body id="webview-body">
         <header>
-          <h1>${note.title}</h1>
+          <h1>${post.title}</h1>
         </header>
         <div>${
-          note?.coverImage?.url ? `<img src="${note.coverImage.url}" />` : ""
+          post?.coverImage?.url ? `<img src="${post.coverImage.url}" />` : ""
         }</div>
         <section>
-          <div id="blog-content">${note?.content?.html}</div>
+        <div id="blog-info">
+        <p>Views: ${post?.views}</p>
+        <p id="read-time">Read Time: ${post?.readTimeInMinutes} mins</p> 
+        </div>
+        <div id="divider">
+        <vscode-divider role="presentation"></vscode-divider>
+        </div>
+        <div id="blog-content">${post?.content?.html}</div>
         </section>
       </body>
     </html>

@@ -21,6 +21,8 @@ export const postBlog = async (input: PostBlog, token: string) => {
         post {
           id
           title
+          views
+          readTimeInMinutes
           content {
             html
             markdown
@@ -40,7 +42,7 @@ export const postBlog = async (input: PostBlog, token: string) => {
     const data: PostData = await graphQLClient.request(mutation, { input });
     return data?.publishPost?.post;
   } catch (err) {
-    console.log("Errata: ", err);
+    console.log("err: ", err);
   }
 };
 
@@ -57,6 +59,8 @@ export const updateBlog = async (input: PostBlog, token: string) => {
         post {
           id
           title
+          views
+          readTimeInMinutes
           content {
             html
             markdown
@@ -78,7 +82,7 @@ export const updateBlog = async (input: PostBlog, token: string) => {
     });
     return data?.updatePost?.post;
   } catch (err) {
-    console.log("Errata: ", err);
+    console.log("err: ", err);
   }
 };
 
@@ -105,6 +109,6 @@ export const removeBlog = async (input: DeleteBlog, token: string) => {
     });
     return data.removePost?.post;
   } catch (err) {
-    console.log("Errata: ", err);
+    console.log("err: ", err);
   }
 };

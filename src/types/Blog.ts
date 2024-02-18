@@ -33,6 +33,8 @@ export type Post = {
   publication: {
     id: string;
   };
+  views?: number;
+  readTimeInMinutes?: number;
 };
 
 export type NewPost = {
@@ -58,15 +60,4 @@ export type PostBlog = {
   publicationId: string;
   coAuthors: string[];
   tags: { name: string; slug: string }[];
-};
-
-export type AuthError<T = any> = {
-  response: {
-    data: T;
-    errors: Message[];
-  };
-};
-
-export type Message = {
-  message: string;
 };

@@ -29,6 +29,22 @@
   font-size: large;
 }
 
+#blog-info {
+  font-size: medium;
+  display: flex;
+  justify-content: space-between;
+}
+
+#read-time {
+  margin-left: auto;
+}
+
+#divider {
+  border-bottom: 0.5px solid white;
+  width: 95%;
+  margin: 2% auto;
+}
+
 @media screen and (min-width: 1024px) {
   #webview-body {
     padding: 0 8rem;

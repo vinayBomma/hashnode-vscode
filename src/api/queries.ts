@@ -23,6 +23,8 @@ export const getAuthUser = async (
           nodes {
             id
             title
+            views
+            readTimeInMinutes
             content {
               html
               markdown
@@ -44,6 +46,6 @@ export const getAuthUser = async (
     saveData(context, "publicationId", data.me.posts.nodes[0].publication.id);
     return data.me.posts;
   } catch (err) {
-    console.log(err);
+    console.log("err: ", err);
   }
 };

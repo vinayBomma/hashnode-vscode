@@ -241,47 +241,52 @@ export function activate(context: vscode.ExtensionContext) {
         };
       }
 
-      const confirmation = await vscode.window.showInputBox({
-        prompt: "Are you sure you want to publish post to Hashnode?",
-        title: "Enter YES to Publish Post",
-        validateInput: (input) => {
-          if (!input) {
-            return "Please enter a value.";
+      vscode.window
+        .showInformationMessage(
+          `Are you sure you want to ${
+            isUpdate ? "update" : "publish"
+          } this post?`,
+          "Yes",
+          "No"
+        )
+        .then(async (confirmation) => {
+          if (confirmation === "Yes") {
+            if (isUpdate) {
+              response = await updateBlog(postInput, hashnodeToken as string);
+            } else {
+              response = await postBlog(postInput, hashnodeToken as string);
+            }
+
+            if (response) {
+              const newPost: Post = {
+                id: response?.id,
+                title: response?.title,
+                content: {
+                  html: response?.content.html,
+                  markdown: response?.content.markdown,
+                },
+                coverImage: {
+                  url: response?.coverImage?.url ?? "",
+                },
+                publication: {
+                  id: response?.publication?.id,
+                },
+              };
+              if (isUpdate) {
+                blogs = blogs.filter((blog) => blog.id !== data.id);
+                blogs.unshift(newPost);
+                blogDataProvider.refresh(blogs);
+              } else {
+                blogs.unshift(newPost);
+                blogDataProvider.refresh(blogs);
+              }
+            }
+            vscode.window.showInformationMessage("Post Published Successfully");
+            panel?.dispose();
+          } else {
+            vscode.window.showErrorMessage("Post Not Published");
           }
-
-          return null;
-        },
-      });
-      if (confirmation === "YES") {
-        if (isUpdate) {
-          response = await updateBlog(postInput, hashnodeToken as string);
-        } else {
-          response = await postBlog(postInput, hashnodeToken as string);
-        }
-
-        if (response) {
-          const newPost: Post = {
-            id: response?.id,
-            title: response?.title,
-            content: {
-              html: response?.content.html,
-              markdown: response?.content.markdown,
-            },
-            coverImage: {
-              url: response?.coverImage?.url ?? "",
-            },
-            publication: {
-              id: response?.publication?.id,
-            },
-          };
-          blogs.unshift(newPost);
-          blogDataProvider.refresh(blogs);
-        }
-        vscode.window.showInformationMessage("Post Published Successfully");
-        panel?.dispose();
-      } else {
-        vscode.window.showErrorMessage("Post Not Published");
-      }
+        });
     } else {
       vscode.window.showErrorMessage("Please fill all the fields");
     }

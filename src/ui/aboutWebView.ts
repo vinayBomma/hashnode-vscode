@@ -35,7 +35,13 @@ export function aboutWebView(webview: Webview, extensionUri: Uri) {
                 </ul>
             </div>
             <div>
-              <h2>Usage</h2>
+              <h2>Future Enhancements</h2>
+                <ul id="blog-content">
+                  <li>Option to add cover images.</li>
+                  <li>View other user's posts.</li>
+                  <li>Newsletter feature.</li>
+                  <li>View your Hashnode Feed.</li>
+                </ul>
             </div>
             <div>
               <h2>Requirements</h2>

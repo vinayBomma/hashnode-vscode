@@ -3,6 +3,7 @@
   "displayName": "Hashnode on VSCode",
   "description": "Seamlessly manage your Hashnode blog directly from within your favorite code editor.",
   "version": "1.0.0",
+  "license": "MIT",
   "publisher": "Vinay Bomma",
   "author": {
     "name": "Vinay Bomma"

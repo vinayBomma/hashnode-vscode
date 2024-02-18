@@ -1,14 +1,29 @@
 {
   "name": "hashnode-on-vscode",
   "displayName": "Hashnode on VSCode",
-  "description": "",
-  "version": "0.0.1",
+  "description": "Seamlessly manage your Hashnode blog directly from within your favorite code editor.",
+  "version": "1.0.0",
+  "publisher": "Vinay Bomma",
+  "author": {
+    "name": "Vinay Bomma"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "Hashnode",
+    "blog",
+    "vscode",
+    "write"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vinayBomma/hashnode-vscode.git"
+  },
+  "icon": "./src/assets/logo.png",
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
@@ -104,7 +119,7 @@
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "node ./esbuild.js",
-    "package": "NODE_ENV=production node ./esbuild.js",
+    "package": "node ./esbuild.js",
     "watch": "node ./esbuild.js --watch",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",

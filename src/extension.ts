@@ -12,6 +12,7 @@ import { createPostWebView } from "./ui/createPostWebView";
 import { postBlog, removeBlog, updateBlog } from "./api/mutations";
 import { previewPostWebView } from "./ui/previewPostWebView";
 import { marked } from "marked";
+import { aboutWebView } from "./ui/aboutWebView";
 
 export function activate(context: vscode.ExtensionContext) {
   let blogs: Post[] = [];
@@ -298,6 +299,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showErrorMessage("Please fill all the fields");
     }
   };
+
   const createBlog = vscode.commands.registerCommand(
     "hashnode-on-vscode.createPost",
     () => {
@@ -423,12 +425,35 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const showInformation = vscode.commands.registerCommand(
+    "hashnode-on-vscode.about",
+    () => {
+      let aboutPanel = vscode.window.createWebviewPanel(
+        "aboutView",
+        "About",
+        vscode.ViewColumn.One,
+        {
+          enableScripts: true,
+          localResourceRoots: [
+            vscode.Uri.joinPath(context.extensionUri, "dist"),
+          ],
+        }
+      );
+
+      aboutPanel.webview.html = aboutWebView(
+        aboutPanel.webview,
+        context.extensionUri
+      );
+    }
+  );
+
   context.subscriptions.push(addToken);
   context.subscriptions.push(fetchBlog);
   context.subscriptions.push(createBlog);
   context.subscriptions.push(openBlog);
   context.subscriptions.push(editBlog);
   context.subscriptions.push(deleteBlog);
+  context.subscriptions.push(showInformation);
 }
 
 export function deactivate() {}

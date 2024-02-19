@@ -29,9 +29,9 @@ Hashnode on VSCode is an extension that integrates the popular blogging platform
 
 ## Contributing
 
-Contributions are welcome! Feel free to open an issue or submit a pull request on the [Github respository](https://github.com/vinayBomma/hashnode-vscode") for this extension.
+Contributions are welcome! Feel free to open an issue or submit a pull request on the [Github respository](https://github.com/vinayBomma/hashnode-vscode) for this extension.
 
-Additionally, you can reach out to me on my [email]("mailto:vbomma.it@gmail.com").
+Additionally, you can reach out to me on my email - vbomma.it@gmail.com
 
 ## Release Notes
 
